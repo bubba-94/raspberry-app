@@ -1,0 +1,31 @@
+# Base style
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 80
+UseTab: Yes
+
+# Naming rules
+DerivePointerAlignment: false
+PointerAlignment: Left
+
+# Class/Struct
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+
+# Align everything neatly
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignEscapedNewlines: Right
+
+# Include formatting
+IncludeBlocks: Preserve
+SortIncludes: true
+
+# File-specific settings (not automated, just guidelines)
+# Files: PascalCase except main.cpp
+# Classes: PascalCase
+# Functions/variables: camelCase
+# Constants and preprocessor macros: UPPER_CASE
+
+# Braces
+BreakBeforeBraces: Allman
