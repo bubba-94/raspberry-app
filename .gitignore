@@ -3,7 +3,6 @@ build/
 build-*/
 cmake-build-*/
 out/
-bin/
 lib/
 
 # --- CMake generated files ---
@@ -24,8 +23,8 @@ CMakeScripts/
 *.d
 *.dylib
 *.dll
-*.so
 *.a
+*.so
 *.lib
 *.exe
 *.out
@@ -65,4 +64,10 @@ CMakeScripts/
 *.bak
 *.DS_Store
 
-*.drawio
+
+# Repo specific 
+x86
+arm64
+sysrootcpy-pi5
+DIARY.md
+flow.drawio
