@@ -19,9 +19,6 @@ if [ -f "$PC_DIR/CMakeCache.txt" ]; then
     rm -rf "$PC_DIR/CMakeCache.txt" "$PC_DIR/CMakeFiles"
 fi
 
-# Make sure dir exists
-mkdir -p "$PC_DIR"
-
 # Find directory and build for x86
 echo "Configuring and building for x86..."
 cd "$PC_DIR" || exit 1
@@ -29,29 +26,29 @@ cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_TOOLCHAIN_FILE=toolchain-x86.cm
 cmake --build .
 echo "Build for x86 done."
 
+cd ..
 # Build for ARM second
 
 if [ ! -d "$PI_DIR" ]; then 
     echo "Creating build directory: $PI_DIR"
     mkdir "$PI_DIR"
 else 
-    echo "Build directory alreadyexists: $PI_DIR"
+    echo "Build directory already exists: $PI_DIR"
 fi
 
 if [ -f "$PI_DIR/CMakeCache.txt" ]; then
-    echo "Cleaning arm64 CMake cache"
+    echo "Cleaning aarch64 CMake cache"
     rm -rf "$PI_DIR/CMakeCache.txt" "$PI_DIR/CMakeFiles"
 fi
 
-# Make sure dir exists 
+# Confgiure script for building aarch64
+echo "Configuring and building for aarch64..."
+cd "$PI_DIR" || exit 1c
+cmake .. \
+  -DCMAKE_TOOLCHAIN_FILE=../toolchain-aarch64.cmake \
+  -DCMAKE_INSTALL_PREFIX=/usr
 
-mkdir -p "$PI_DIR"
-
-# Confgiure script for building arm64
-echo "Configuring and building for arm64..."
-cd "$PI_DIR" || exit 1
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_TOOLCHAIN_FILE=toolchain-arm64.cmake ..
 cmake --build .
-echo "Build for arm64 done."
+echo "Build for aarch64 done."
 
 

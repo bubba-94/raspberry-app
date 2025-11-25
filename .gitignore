@@ -67,7 +67,7 @@ CMakeScripts/
 
 # Repo specific 
 x86
-arm64
+aarch64
 sysrootcpy-pi5
 DIARY.md
 flow.drawio

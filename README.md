@@ -14,8 +14,20 @@ Take over the Raspberry Monitor opening a terminal that renderes graphics [SDL2 
 
 ## Building 
 
-Make sure compile-x86 and run.sh are executable and then run them
+### Pre requisites
+
+- Sysroot of target environment
+
+build.sh will build and compile executables for both PC and Pi 5 and gather them under separate architecture folders under bin/
+
 
 ## Testing
+
+### Testing on the PC 
+
+- `./run.sh` from root repo to run the x86 binary.
+- Testing aarch64 binary on PC `ssh -X user@pi` to forward x11 and open a SDL terminal on the desktop.
+
+- 
 
 ## Running

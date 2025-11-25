@@ -1,8 +1,87 @@
 cmake_minimum_required(VERSION 3.15)
 project(SDL2APP LANGUAGES CXX)
 
-# Find SDL2 (creates INCLUDE_DIRS if found)
-find_package(SDL2 REQUIRED)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g")
+
+set(ARCHIVE _sdl2x86)
+
+set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+    set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin/x86")
+
+    message(STATUS ${STARTYELLOW})
+    
+    if(NOT DEFINED TOOLCHAIN_PRINTED)
+        message(STATUS "CMakeLists.txt output for x86")
+        message(STATUS "C++ compiler            = ${CMAKE_CXX_COMPILER}")
+        message(STATUS "C++ standard            = ${CMAKE_CXX_STANDARD}")
+        message(STATUS "Compiler flags          = ${CMAKE_CXX_FLAGS}")
+        message(STATUS "Static library filename = lib${ARCHIVE}.a")
+        message(STATUS "Source file directory   = ${SRC_DIR}")
+        message(STATUS "Header file diretory    = ${INCLUDE_DIR}")
+        message(STATUS "Binary output directory = ${OUTPUT_DIR}")
+        set(TOOLCHAIN_PRINTED TRUE CACHE INTERNAL "Prevent toolchain output twice")
+    endif()
+
+    find_package(SDL2 REQUIRED)
+
+    message(STATUS ${ENDYELLOW})
+
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    # Locate _real_config.h
+    find_path(SDL2_INCLUDE_DIR
+        SDL.h
+        HINTS 
+        ${SYSROOT}/usr/include/SDL2
+        ${SYSROOT}/usr/include/aarch64-linux-gnu/SDL2
+    )
+
+    # SDL2 library in sysroot
+    find_library(SDL2_LIBRARY
+        NAMES SDL2
+        HINTS ${SYSROOT}/usr/lib
+    )
+
+    # Create imported target
+    add_library(SDL2::SDL2 STATIC IMPORTED)
+    set_target_properties(SDL2::SDL2 PROPERTIES
+        IMPORTED_LOCATION "${SDL2_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIR}"
+    )
+
+    
+    set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin/aarch64")
+    
+    message(STATUS ${STARTGREEN})
+    
+    if(NOT DEFINED TOOLCHAIN_PRINTED)
+    message(STATUS "CMakeLists.txt output for aarch64")
+    message(STATUS "C++ compiler            = ${CMAKE_CXX_COMPILER}")
+    message(STATUS "C++ standard            = ${CMAKE_CXX_STANDARD}")
+    message(STATUS "Compiler flags          = ${CMAKE_CXX_FLAGS}")
+    message(STATUS "Target OS               = ${CMAKE_SYSTEM_NAME}")
+    message(STATUS "Target processor        = ${CMAKE_SYSTEM_PROCESSOR}")
+    message(STATUS "Sysroot                 = ${SYSROOT}")
+    message(STATUS "Source files directory  = ${SRC_DIR}" )
+    message(STATUS "Headers directory       = ${INCLUDE_DIR}")
+    message(STATUS "Binary output directory = ${OUTPUT_DIR}")
+    message(STATUS "Using SDL2 from sysroot: ${SDL2_LIBRARY}, include: ${SDL2_INCLUDE_DIR}")
+        set(TOOLCHAIN_PRINTED TRUE CACHE INTERNAL "Prevent toolchain print twice")
+    endif()
+
+    # Make CMake look in sysroot for SDL2
+    set(CMAKE_PREFIX_PATH "${SYSROOT}/usr/lib/cmake/SDL2" ${CMAKE_PREFIX_PATH})
+
+    message(STATUS ${ENDGREEN})
+endif() 
+
+# Target output
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
 # Include src/CMakeLists.txt
 add_subdirectory(${SRC_DIR} sdl2-archive)
