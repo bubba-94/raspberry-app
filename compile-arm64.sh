@@ -2,9 +2,9 @@
 
 # Variables
 BUILD_DIR=build
-X86_DIR=x86
+ARM_DIR=arm64
 SOURCE_DIR=$(pwd)
-OUTPUT_DIR="$SOURCE_DIR/bin/$X86_DIR"
+OUTPUT_DIR="$SOURCE_DIR/bin/$ARM_DIR"
 
 # Create build directory if it doesn't exist
 if [ ! -d "$BUILD_DIR" ]; then
@@ -14,7 +14,7 @@ else
     echo "Build directory already exists: $BUILD_DIR"
 fi
 
-# Optionally clean CMake cache
+
 if [ -f "$BUILD_DIR/CMakeCache.txt" ]; then
     echo "Cleaning CMake cache..."
     rm -rf "$BUILD_DIR/CMakeCache.txt" "$BUILD_DIR/CMakeFiles"
@@ -23,17 +23,9 @@ fi
 # Ensure output directory exists
 mkdir -p "$OUTPUT_DIR"
 
-# Build for x86
-echo "Configuring and building for $X86_DIR..."
+# Build for arm64
+echo "Configuring and building for $ARM_DIR..."
 
 cd "$BUILD_DIR" || exit 1
-
-# Configure CMake
-# - Export compile commands for clang-tidy or other tools
-# - Set runtime, archive, and library output directories
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
-
-# Build
+cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-arm64.cmake -DCMAKE_BUILD-TYPE=Debug ..
 cmake --build .
-
-echo "Build for $X86_DIR done."
