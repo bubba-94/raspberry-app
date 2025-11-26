@@ -1,10 +1,10 @@
 add_library(${ARCHIVE}
     STATIC 
-       EventManager.cpp
-       Render.cpp
-       Window.cpp
-       Surface.cpp
-       Texture.cpp
+       SDL/EventManager.cpp
+       SDL/Render.cpp
+       SDL/Window.cpp
+       SDL/Surface.cpp
+       SDL/Texture.cpp
 )
 
 target_include_directories(${ARCHIVE} PUBLIC ${INCLUDE_DIR})
