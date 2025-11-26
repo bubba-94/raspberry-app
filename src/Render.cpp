@@ -1,5 +1,5 @@
-#include "Renderer.hpp"
-#include "Window.hpp"
+#include "SDL/Render.hpp"
+#include "SDL/Window.hpp"
 
 Renderer::Renderer(Window &window) {
   renderer.reset(

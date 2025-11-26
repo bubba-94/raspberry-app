@@ -1,4 +1,4 @@
-#include "EventManager.hpp"
+#include "SDL/EventManager.hpp"
 
 EventManager::EventManager() : events{} {}
 

@@ -4,20 +4,17 @@
  * vehicles.
  */
 
-// Has to be linked.
-#include "EventManager.hpp"
-#include "Renderer.hpp"
-#include "Window.hpp"
-#include <iostream>
+// 
+#include "SDL.hpp"
 
 int main() {
 
   Window wind;
-  Window *ptr = &wind;
+  Window *wind_ptr = &wind;
   EventManager manager;
-  Renderer rend(*ptr);
+  Renderer rend(*wind_ptr);
 
-  wind.createWindow("Pi window", 1920, 1080);
+  wind.createWindow("Pi window", 1080, 640);
 
   while (wind.getState()) {
     // Queue for events
@@ -25,10 +22,12 @@ int main() {
 
     while (manager.hasEvent()) {
 
+      // Create wrapper in event manager?
       SDL_Event e = manager.getNext();
 
       switch (e.type) {
 
+      
       case SDL_QUIT:
         std::cout << "Closing SDL Window " << '\n';
         wind.shutdown();

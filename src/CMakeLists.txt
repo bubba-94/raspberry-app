@@ -1,8 +1,10 @@
 add_library(${ARCHIVE}
     STATIC 
        EventManager.cpp
-       Renderer.cpp
+       Render.cpp
        Window.cpp
+       Surface.cpp
+       Texture.cpp
 )
 
 target_include_directories(${ARCHIVE} PUBLIC ${INCLUDE_DIR})
