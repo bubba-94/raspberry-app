@@ -2,9 +2,9 @@
 #define WINDOW_HPP
 
 // SDL2 Library
+#include <SDL2/SDL.h>
 
 // C++ standard libs
-#include <SDL2/SDL.h>
 #include <memory>
 #include <string>
 
@@ -24,7 +24,7 @@ public:
   Window() = default;
   ~Window() = default;
 
-  void createWindow(const std::string &title, int width, int height);
+  void create(const std::string &title, int width, int height);
   bool getState();
   void shutdown();
   SDL_Window *getWindow();

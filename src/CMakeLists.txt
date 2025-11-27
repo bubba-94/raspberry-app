@@ -7,7 +7,13 @@ add_library(${ARCHIVE}
        SDL/Texture.cpp
 )
 
-target_include_directories(${ARCHIVE} PUBLIC ${INCLUDE_DIR})
-target_link_libraries(${ARCHIVE} PUBLIC SDL2::SDL2)
+target_include_directories(${ARCHIVE}
+    PUBLIC
+        ${INCLUDE_DIR}
+)
 
-message("-- ${ARCHIVE} linked.")
+target_link_libraries(${ARCHIVE}
+    PUBLIC
+        SDL2::SDL2
+        SDL2::SDL2_image
+)

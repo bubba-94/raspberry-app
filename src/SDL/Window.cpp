@@ -1,6 +1,6 @@
 #include "SDL/Window.hpp"
 
-void Window::createWindow(const std::string &title, int width, int height) {
+void Window::create(const std::string &title, int width, int height) {
   window.reset(SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED, width, height,
                                 SDL_WINDOW_SHOWN));

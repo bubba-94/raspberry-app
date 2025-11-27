@@ -25,9 +25,11 @@ private:
   bool state = false;
 
 public:
+
   Renderer(Window &window);
   ~Renderer() = default;
-  void createRenderer(Window *window);
+
+  SDL_Renderer* getRenderer();
 };
 
 #endif

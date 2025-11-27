@@ -27,6 +27,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     endif()
 
     find_package(SDL2 REQUIRED)
+    find_package(SDL2_image REQUIRED) 
 
     message(STATUS ${ENDYELLOW})
 
