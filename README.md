@@ -16,9 +16,10 @@ Take over the Raspberry Monitor opening a terminal that renderes graphics [SDL2 
 
 ### Pre requisites
 
-- Sysroot of target environment
+- Sysroot of target environment under and a path to it called MY_OWN_SYSROOTS
 
 build.sh will build and compile executables for both PC and Pi 5 and gather them under separate architecture folders under bin/
+
 
 
 ## Testing

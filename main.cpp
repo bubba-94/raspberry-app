@@ -4,17 +4,18 @@
  * vehicles.
  */
 
-// 
-#include "SDL.hpp"
+//
+#include "include/SDL.hpp"
+#include <iostream>
 
 int main() {
 
   Window wind;
-  Window *wind_ptr = &wind;
+  Window *windPtr = &wind;
   EventManager manager;
-  Renderer rend(*wind_ptr);
+  Renderer rend(*windPtr);
 
-  wind.createWindow("Pi window", 1080, 640);
+  wind.create("Pi window", 1080, 640);
 
   while (wind.getState()) {
     // Queue for events
@@ -27,7 +28,6 @@ int main() {
 
       switch (e.type) {
 
-      
       case SDL_QUIT:
         std::cout << "Closing SDL Window " << '\n';
         wind.shutdown();

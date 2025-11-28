@@ -15,5 +15,4 @@ target_include_directories(${ARCHIVE}
 target_link_libraries(${ARCHIVE}
     PUBLIC
         SDL2::SDL2
-        SDL2::SDL2_image
 )

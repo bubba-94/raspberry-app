@@ -3,6 +3,7 @@
 PI_DIR=build-aarch_64
 PC_DIR=build-x86_64
 
+INSTALL_DIR="$MY_OWN_SYSROOT/R-Pi5"
 ROOT_DIR=$(pwd)
 
 # Build for x86 first
@@ -46,7 +47,7 @@ echo "Configuring and building for aarch64..."
 cd "$PI_DIR" || exit 1c
 cmake .. \
   -DCMAKE_TOOLCHAIN_FILE=../toolchain-aarch64.cmake \
-  -DCMAKE_INSTALL_PREFIX=/usr
+  -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
 
 cmake --build .
 echo "Build for aarch64 done."
