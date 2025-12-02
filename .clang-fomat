@@ -4,22 +4,16 @@ IndentWidth: 4
 ColumnLimit: 80
 UseTab: Space
 
+# Braces
+BreakBeforeBraces: Allman
+
+
 # Naming rules
 DerivePointerAlignment: false
 PointerAlignment: Right
 
-# Class/Struct
+BinPackParameters: false
+AllowAllParametersOfDeclarationOnNextLine: true
+
 AllowShortFunctionsOnASingleLine: Inline
 AllowShortIfStatementsOnASingleLine: false
-
-# Align everything neatly
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: true
-AlignEscapedNewlines: Right
-
-# Include formatting
-IncludeBlocks: Preserve
-SortIncludes: true
-
-# Braces
-BreakBeforeBraces: Allman
