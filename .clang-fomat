@@ -1,12 +1,12 @@
 # Base style
-BasedOnStyle: Google
+BasedOnStyle: Allman
 IndentWidth: 4
 ColumnLimit: 80
 UseTab: Space
 
 # Naming rules
 DerivePointerAlignment: false
-PointerAlignment: Left
+PointerAlignment: Right
 
 # Class/Struct
 AllowShortFunctionsOnASingleLine: Inline

@@ -4,17 +4,23 @@ project(SDL2APP LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g")
 
-set(ARCHIVE _sdl2x86)
-
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    set(ARCHIVE _sdl2pi5)
+else()
+    set(ARCHIVE _sdl2x86)
+endif()
+
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+
     set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin/x86")
 
     message(STATUS ${STARTYELLOW})
     
     if(NOT DEFINED TOOLCHAIN_PRINTED)
+        # Prints when building for debugg
         message(STATUS "CMakeLists.txt output for x86")
         message(STATUS "C++ compiler            = ${CMAKE_CXX_COMPILER}")
         message(STATUS "C++ standard            = ${CMAKE_CXX_STANDARD}")
@@ -27,22 +33,36 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     endif()
 
     find_package(SDL2 REQUIRED)
+    find_package(SDL2_image REQUIRED)
 
     message(STATUS ${ENDYELLOW})
 
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+
     # Locate _real_config.h
     find_path(SDL2_INCLUDE_DIR
         SDL.h
         HINTS 
-        ${SYSROOT}/usr/include/SDL2
-        ${SYSROOT}/usr/include/aarch64-linux-gnu/SDL2
+        "${SYSROOT}/usr/include/SDL2/"
+        "${SYSROOT}/usr/include/aarch64-linux-gnu/SDL2/"
     )
 
     # SDL2 library in sysroot
     find_library(SDL2_LIBRARY
         NAMES SDL2
-        HINTS ${SYSROOT}/usr/lib
+        HINTS "${SYSROOT}/usr/lib"
+    )
+
+    find_path(SDL2_IMAGE_INCLUDE_DIR
+        SDL_image.h
+        HINTS 
+        "${SYSROOT}/usr/include/SDL2/"
+        "${SYSROOT}/usr/include/aarch64-linux-gnu/SDL2/"
+    )
+
+    find_library(SDL2_IMAGE_LIBRARY
+        NAMES SDL2_image
+        HINTS "${SYSROOT}/usr/lib"
     )
 
     # Create imported target
@@ -52,23 +72,32 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
         INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIR}"
     )
 
+    add_library(SDL2::SDL2_image STATIC IMPORTED)
+    set_target_properties(SDL2::SDL2_image PROPERTIES
+        IMPORTED_LOCATION ${SDL2_IMAGE_LIBRARY}
+        INTERFACE_INCLUDE_DIRECTORIES ${SDL2_IMAGE_INCLUDE_DIR}
+    )
     
     set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin/aarch64")
     
     message(STATUS ${STARTGREEN})
     
     if(NOT DEFINED TOOLCHAIN_PRINTED)
-    message(STATUS "CMakeLists.txt output for aarch64")
-    message(STATUS "C++ compiler            = ${CMAKE_CXX_COMPILER}")
-    message(STATUS "C++ standard            = ${CMAKE_CXX_STANDARD}")
-    message(STATUS "Compiler flags          = ${CMAKE_CXX_FLAGS}")
-    message(STATUS "Target OS               = ${CMAKE_SYSTEM_NAME}")
-    message(STATUS "Target processor        = ${CMAKE_SYSTEM_PROCESSOR}")
-    message(STATUS "Sysroot                 = ${SYSROOT}")
-    message(STATUS "Source files directory  = ${SRC_DIR}" )
-    message(STATUS "Headers directory       = ${INCLUDE_DIR}")
-    message(STATUS "Binary output directory = ${OUTPUT_DIR}")
-    message(STATUS "Using SDL2 from sysroot: ${SDL2_LIBRARY}, include: ${SDL2_INCLUDE_DIR}")
+
+        # Prints when building for debugging
+        message(STATUS "CMakeLists.txt output for aarch64")
+        message(STATUS "C++ compiler            = ${CMAKE_CXX_COMPILER}")
+        message(STATUS "C++ standard            = ${CMAKE_CXX_STANDARD}")
+        message(STATUS "Compiler flags          = ${CMAKE_CXX_FLAGS}")
+        message(STATUS "Target OS               = ${CMAKE_SYSTEM_NAME}")
+        message(STATUS "Target processor        = ${CMAKE_SYSTEM_PROCESSOR}")
+        message(STATUS "Sysroot                 = ${SYSROOT}")
+        message(STATUS "Source files directory  = ${SRC_DIR}" )
+        message(STATUS "Headers directory       = ${INCLUDE_DIR}")
+        message(STATUS "Binary output directory = ${OUTPUT_DIR}")
+        message(STATUS "SDL2 sysroot lib        = ${SDL2_LIBRARY}")
+        message(STATUS "SDL2 include dir        = ${SDL2_INCLUDE_DIR}")
+        
         set(TOOLCHAIN_PRINTED TRUE CACHE INTERNAL "Prevent toolchain print twice")
     endif()
 

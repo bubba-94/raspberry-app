@@ -3,7 +3,6 @@
 set(CMAKE_C_COMPILER gcc)
 set(CMAKE_CXX_COMPILER g++)
 
-
 # Coloring for status
 set(CMAKE_COLOR_DIAGNOSTICS ON CACHE INTERNAL "Allow coloring in CMakeLists.txt")
 string(ASCII 27 Esc)

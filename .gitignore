@@ -1,6 +1,5 @@
 # --- Build directories ---
 build/
-build-*/
 cmake-build-*/
 out/
 lib/
@@ -68,6 +67,7 @@ CMakeScripts/
 # Repo specific 
 x86
 aarch64
-sysrootcpy-pi5
 DIARY.md
 flow.drawio
+img/
+build-*/

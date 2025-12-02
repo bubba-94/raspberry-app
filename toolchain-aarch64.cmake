@@ -5,8 +5,10 @@ set(CMAKE_SYSTEM_PROCESSOR aarch64)
 set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
 
+set(MY_SYSROOT "$ENV{MY_OWN_SYSROOTS}")
 # Path to sysroot
-set(SYSROOT "${CMAKE_CURRENT_LIST_DIR}/sysrootcpy-pi5")
+set(SYSROOT "${MY_SYSROOT}/R-Pi5")
+
 
 # Force the compiler to look inside SYSROOT
 set(CMAKE_SYSROOT "${SYSROOT}")
