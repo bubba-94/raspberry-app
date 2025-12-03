@@ -11,15 +11,39 @@
 #include <queue>
 #include <string>
 
-/// Defines to keep WindowApp clean
+/// header to keep WindowApp clean
 #include "SDLTypes.hpp"
 
 /// Windows specs
-constexpr int WINDOW_WIDTH = 640;
-constexpr int WINDOW_HEIGHT = 480;
-constexpr int WIDTH_PADDING = WINDOW_WIDTH - 200;
-constexpr int HEIGHT_PADDING = WINDOW_HEIGHT - 200;
+constexpr Uint16 WINDOW_WIDTH = 1920;
+constexpr Uint16 WINDOW_HEIGHT = 1080;
 constexpr const char *WINDOW_TITLE = "SDLManager Window";
+
+// Image paths ()
+constexpr const char *LOGO =
+    "/home/moodin/coding/internship/raspberry-app/img/logo.png";
+constexpr const char *IMAGE =
+    "/home/moodin/coding/internship/raspberry-app/img/qr.png";
+
+// Surface sizes
+constexpr Uint16 IMAGE_WIDTH = 400;
+constexpr Uint16 IMAGE_HEIGHT = 400;
+constexpr Uint16 LOGO_WIDTH = 225;
+constexpr Uint16 LOGO_HEIGHT = 225;
+
+// Middle of the screen (centered)
+constexpr Uint16 IMAGE_X = ((WINDOW_WIDTH / 2) + IMAGE_WIDTH / 2) - IMAGE_WIDTH;
+constexpr Uint16 IMAGE_Y =
+    (WINDOW_HEIGHT / 2) + (IMAGE_HEIGHT / 2) - IMAGE_HEIGHT;
+
+// Logo position  (should be bottom right)
+constexpr Uint16 LOGO_X = WINDOW_WIDTH - LOGO_WIDTH;
+constexpr Uint16 LOGO_Y = WINDOW_HEIGHT - LOGO_HEIGHT;
+
+// Background
+constexpr Uint8 RED = 255;
+constexpr Uint8 GREEN = 255;
+constexpr Uint8 BLUE = 255;
 
 /**
  *
@@ -32,36 +56,63 @@ constexpr const char *WINDOW_TITLE = "SDLManager Window";
  */
 class SDLManager {
 private:
+  SDL_Rect frame;
   sdl_unique<SDL_Window> window;
-  sdl_unique<SDL_Renderer> renderer;
   sdl_unique<SDL_Surface> surface;
-  sdl_unique<SDL_Texture> texture;
+  sdl_unique<SDL_Renderer> renderer;
+  sdl_unique<SDL_Texture> logo;
+  sdl_unique<SDL_Texture> image;
 
-  /// @brief  Used for debuggning, probably not needed later
+  //  Used for debugging, probably not needed later
   std::queue<SDL_Event> events;
 
   /// @brief  Bool to track the state of manager
   bool state = true;
 
 public:
-  // Init specific
-  SDLError createWindow();
-  SDLError createRenderer();
-  SDLError createSurface();
-  SDLError createTexture();
-
-  // Calls other inits
-  void init();
+  /**
+   * @brief Sets up the environment for the window.
+   * @return SDLError if failed
+   */
+  SDLError init();
   void shutdown();
 
-  // Prints
+  /*-------------PRINTS-------------*/
   void printErrMsg(const char *errMsg);
 
-  // Getters
+  /*-------------SDL SPECIFIC-------------*/
+
+  // Creation of needed SDL instances
+  SDLError createWindow();
+  SDLError createRenderer();
+
+  // Image and Logo are SDL_Surfaces
+  SDLError loadSurfaceOfIMG(const char *filepath);
+
+  // Requires an SDL_Surface (image).
+  SDLError createImageTexture(SDL_Surface *surface);
+  SDLError createLogoTexture(SDL_Surface *surface);
+
+  // Get raw instance pointers
   SDL_Window *getRawWindow() const;
   SDL_Renderer *getRawRenderer() const;
   SDL_Surface *getRawSurface() const;
-  SDL_Texture *getRawTexture() const;
+  SDL_Texture *getRawImage() const;
+  SDL_Texture *getRawLogo() const;
+
+  // Image functions
+  int loadLogo();
+  int loadImage();
+  void presentWindow();
+
+  /**
+   * @brief wrapper around sdl clear and draw color.
+   * @param r amount of red
+   * @param g amount of green
+   * @param b amount of blue
+   */
+  void setBackground(Uint8 r, Uint8 g, Uint8 b);
+  void drawImageFrame();
 
   // Events, will not be used later
   bool getState();

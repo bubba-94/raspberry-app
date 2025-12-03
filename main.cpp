@@ -34,10 +34,11 @@ int main() {
         break;
       }
     }
-    SDL_Delay(16);
+
+    sdl.presentWindow();
+    SDL_Delay(200);
   }
 
   sdl.shutdown();
-
   return 0;
 }
