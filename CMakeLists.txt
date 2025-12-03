@@ -72,8 +72,8 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
         INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIR}"
     )
 
-    add_library(SDL2::SDL2_image STATIC IMPORTED)
-    set_target_properties(SDL2::SDL2_image PROPERTIES
+    add_library(SDL2_image::SDL2_image STATIC IMPORTED)
+    set_target_properties(SDL2_image::SDL2_image PROPERTIES
         IMPORTED_LOCATION ${SDL2_IMAGE_LIBRARY}
         INTERFACE_INCLUDE_DIRECTORIES ${SDL2_IMAGE_INCLUDE_DIR}
     )
