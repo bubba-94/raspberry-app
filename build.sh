@@ -1,7 +1,9 @@
 #!/bin/sh
+export MY_OWN_SYSROOTS=~/opt/sysroots
 
 PI_DIR=build-aarch_64
 PC_DIR=build-x86_64
+
 
 INSTALL_DIR="$MY_OWN_SYSROOT/R-Pi5"
 ROOT_DIR=$(pwd)
