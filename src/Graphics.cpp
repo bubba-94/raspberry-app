@@ -3,22 +3,31 @@
 // Init calls all creations.
 SDLError SDLManager::init() {
 
+  // Initialize SDL library before other
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     printErrMsg(SDL_GetError());
     state = false;
     return SDLError::WINDOW_ERR;
   }
 
+  // Initialize IMG library
+  int imgFlags = IMG_INIT_PNG;
+  int imgStatus = IMG_Init(imgFlags);
+  if ((imgStatus & imgFlags) != imgFlags) {
+    state = false;
+    return SDLError::IMAGE_ERR;
+  }
+
+  // Initialize TTF library
+  int fontStatus = TTF_Init();
+  if (fontStatus < 0) {
+    printErrMsg(SDL_GetError());
+    state = false;
+    return SDLError::FONT_ERR;
+  }
+
   // Initialize window, renderer, and img flags.
   if (createWindow() == SDLError::NONE && createRenderer() == SDLError::NONE) {
-
-    int flags = IMG_INIT_PNG;
-    int status = IMG_Init(flags);
-
-    if ((status & flags) != flags) {
-      state = false;
-      return SDLError::IMAGE_ERR;
-    }
   }
 
   // Load qr image
@@ -45,7 +54,7 @@ SDLError SDLManager::init() {
 
 void SDLManager::presentWindow() {
 
-  setRenderingColor(220, 100, 200);
+  setRenderingColor(22, 100, 200);
 
   // Set the cursor and sizes of both surfaces.
   SDL_Rect logoFrame, imageFrame;
@@ -62,6 +71,7 @@ void SDLManager::presentWindow() {
 void SDLManager::shutdown() {
   std::cout << "Application being shutdown...." << "\n";
 
+  TTF_Quit();
   IMG_Quit();
   SDL_Quit();
 }
