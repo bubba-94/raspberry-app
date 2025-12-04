@@ -21,29 +21,24 @@ constexpr const char *WINDOW_TITLE = "SDLManager Window";
 
 // Image paths ()
 constexpr const char *LOGO =
-    "/home/moodin/coding/internship/raspberry-app/img/logo.png";
+    "/home/moodin/coding/internship/raspberry-app/img/pandema.png";
 constexpr const char *IMAGE =
     "/home/moodin/coding/internship/raspberry-app/img/qr.png";
 
 // Surface sizes
 constexpr Uint16 IMAGE_WIDTH = 400;
 constexpr Uint16 IMAGE_HEIGHT = 400;
-constexpr Uint16 LOGO_WIDTH = 225;
-constexpr Uint16 LOGO_HEIGHT = 225;
+constexpr Uint16 LOGO_WIDTH = 242;
+constexpr Uint16 LOGO_HEIGHT = 48;
 
 // Middle of the screen (centered)
 constexpr Uint16 IMAGE_X = ((WINDOW_WIDTH / 2) + IMAGE_WIDTH / 2) - IMAGE_WIDTH;
 constexpr Uint16 IMAGE_Y =
     (WINDOW_HEIGHT / 2) + (IMAGE_HEIGHT / 2) - IMAGE_HEIGHT;
 
-// Logo position  (should be bottom right)
-constexpr Uint16 LOGO_X = WINDOW_WIDTH - LOGO_WIDTH;
-constexpr Uint16 LOGO_Y = WINDOW_HEIGHT - LOGO_HEIGHT;
-
-// Background
-constexpr Uint8 RED = 255;
-constexpr Uint8 GREEN = 255;
-constexpr Uint8 BLUE = 255;
+// Logo position (should be bottom right) with some spacing
+constexpr Uint16 LOGO_X = WINDOW_WIDTH - LOGO_WIDTH - 50;
+constexpr Uint16 LOGO_Y = WINDOW_HEIGHT - LOGO_HEIGHT - 50;
 
 /**
  *
@@ -111,7 +106,7 @@ public:
    * @param g amount of green
    * @param b amount of blue
    */
-  void setBackground(Uint8 r, Uint8 g, Uint8 b);
+  void setRenderingColor(Uint8 r, Uint8 g, Uint8 b);
   void drawImageFrame();
 
   // Events, will not be used later

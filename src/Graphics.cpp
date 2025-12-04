@@ -45,7 +45,7 @@ SDLError SDLManager::init() {
 
 void SDLManager::presentWindow() {
 
-  setBackground(RED, GREEN, BLUE);
+  setRenderingColor(220, 100, 200);
 
   // Set the cursor and sizes of both surfaces.
   SDL_Rect logoFrame, imageFrame;
@@ -111,8 +111,11 @@ SDLError SDLManager::createImageTexture(SDL_Surface *surface) {
 
   if (!image) {
     printErrMsg(SDL_GetError());
-    return SDLError::TEXTURE_ERR;
+    return SDLError::IMAGE_ERR;
   }
+
+  // Optimized the qr code.
+  SDL_SetTextureScaleMode(getRawImage(), SDL_ScaleModeNearest);
 
   return SDLError::NONE;
 }
@@ -124,7 +127,7 @@ SDLError SDLManager::createLogoTexture(SDL_Surface *surface) {
 
   if (!logo) {
     printErrMsg(SDL_GetError());
-    return SDLError::TEXTURE_ERR;
+    return SDLError::LOGO_ERR;
   }
 
   return SDLError::NONE;
@@ -167,7 +170,7 @@ SDL_Surface *SDLManager::getRawSurface() const { return surface.get(); }
 SDL_Texture *SDLManager::getRawImage() const { return image.get(); }
 SDL_Texture *SDLManager::getRawLogo() const { return logo.get(); }
 
-void SDLManager::setBackground(Uint8 r, Uint8 g, Uint8 b) {
+void SDLManager::setRenderingColor(Uint8 r, Uint8 g, Uint8 b) {
   SDL_RenderClear(getRawRenderer());
   // Set a white window
   SDL_SetRenderDrawColor(getRawRenderer(), r, g, b, SDL_ALPHA_OPAQUE);
