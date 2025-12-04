@@ -2,6 +2,8 @@
 #define SDLTYPES_HPP
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 #include <cstdint>
 #include <memory>
@@ -10,33 +12,38 @@
  * @brief Structure for an SDL ptr deleter
  * @param SDL Class for example (SDL_Window or SDL_Surface)
  */
-template <typename T> struct SDL_Deleter;
+template <typename T> struct SDLDeleter;
 
 /**
  * @brief Alias for auto deleter
- * @param T SDL Class pointer (SDL_Window)
+ * @param T SDL Class pointer
  * @return A unique pointer of T .
  */
-template <typename T> using sdl_unique = std::unique_ptr<T, SDL_Deleter<T>>;
+template <typename T> using sdl_unique = std::unique_ptr<T, SDLDeleter<T>>;
 
-template <> struct SDL_Deleter<SDL_Window> {
-  SDL_Deleter() = default;
+template <> struct SDLDeleter<SDL_Window> {
+  SDLDeleter() = default;
   void operator()(SDL_Window *p) const { SDL_DestroyWindow(p); }
 };
 
-template <> struct SDL_Deleter<SDL_Renderer> {
-  SDL_Deleter() = default;
+template <> struct SDLDeleter<SDL_Renderer> {
+  SDLDeleter() = default;
   void operator()(SDL_Renderer *p) const { SDL_DestroyRenderer(p); }
 };
 
-template <> struct SDL_Deleter<SDL_Texture> {
-  SDL_Deleter() = default;
+template <> struct SDLDeleter<SDL_Texture> {
+  SDLDeleter() = default;
   void operator()(SDL_Texture *p) const { SDL_DestroyTexture(p); }
 };
 
-template <> struct SDL_Deleter<SDL_Surface> {
-  SDL_Deleter() = default;
+template <> struct SDLDeleter<SDL_Surface> {
+  SDLDeleter() = default;
   void operator()(SDL_Surface *p) const { SDL_FreeSurface(p); }
+};
+
+template <> struct SDLDeleter<TTF_Font> {
+  SDLDeleter() = default;
+  void operator()(TTF_Font *p) const { TTF_CloseFont(p); }
 };
 
 /**
@@ -51,7 +58,8 @@ enum class SDLError : std::uint8_t {
   RENDER_ERR = 3,
   TEXTURE_ERR = 4,
   IMAGE_ERR = 5,
-  LOGO_ERR = 6
+  LOGO_ERR = 6,
+  FONT_ERR = 7
 };
 
 /**
@@ -66,12 +74,12 @@ enum class SDLError : std::uint8_t {
  * @return Configuration for a SDL_Surface.
  */
 struct SDLImageSpec {
-  int x;
-  int y;
-  int w;
-  int h;
-  int xpad;
-  int ypad;
+  Uint16 x;
+  Uint16 y;
+  Uint16 w;
+  Uint16 h;
+  Uint16 xpad;
+  Uint16 ypad;
 };
 
 #endif

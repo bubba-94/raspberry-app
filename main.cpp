@@ -2,16 +2,16 @@
 
 int main() {
   SDLManager sdl;
-
+  bool image = false;
   sdl.init();
 
   while (sdl.getState()) {
     // Queue for events
     sdl.poll();
 
+    // For debugging and wont be needed later.
     while (sdl.hasEvent()) {
 
-      // Create wrapper in event manager?
       SDL_Event e = sdl.getNext();
 
       switch (e.type) {
@@ -29,14 +29,15 @@ int main() {
       case SDL_MOUSEBUTTONDOWN:
         std::cout << "Mouse clicked at: " << e.button.x << ", " << e.button.y
                   << '\n';
+        image = !image;
         break;
       default:
         break;
       }
     }
 
-    sdl.presentWindow();
-    SDL_Delay(200);
+    sdl.presentWindow(image);
+    SDL_Delay(50);
   }
 
   sdl.shutdown();

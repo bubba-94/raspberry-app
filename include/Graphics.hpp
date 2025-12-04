@@ -1,17 +1,13 @@
 #ifndef GRAPHICS_HPP
 #define GRAPHICS_HPP
 
-/// SDL libraries
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
 /// C++ Standard Library
 #include <iostream>
 #include <memory>
 #include <queue>
 #include <string>
 
-/// header to keep WindowApp clean
+// File to keep this file
 #include "SDLTypes.hpp"
 
 /// Windows specs
@@ -24,14 +20,22 @@ constexpr const char *LOGO =
     "/home/moodin/coding/internship/raspberry-app/img/pandema.png";
 constexpr const char *IMAGE =
     "/home/moodin/coding/internship/raspberry-app/img/qr.png";
+constexpr const char *FONT =
+    "/home/moodin/coding/internship/raspberry-app/fonts/Lato-Light.ttf";
 
 // Surface sizes
-constexpr Uint16 IMAGE_WIDTH = 400;
-constexpr Uint16 IMAGE_HEIGHT = 400;
+constexpr Uint16 FONT_WIDTH = 1000;
+constexpr Uint16 FONT_HEIGHT = 500;
+constexpr Uint16 IMAGE_WIDTH = 500;
+constexpr Uint16 IMAGE_HEIGHT = 500;
 constexpr Uint16 LOGO_WIDTH = 242;
 constexpr Uint16 LOGO_HEIGHT = 48;
 
-// Middle of the screen (centered)
+// Font position (centered)
+constexpr Uint16 FONT_X = ((WINDOW_WIDTH / 2) + FONT_WIDTH / 2) - FONT_WIDTH;
+constexpr Uint16 FONT_Y = ((WINDOW_HEIGHT / 2) + FONT_HEIGHT / 2) - FONT_HEIGHT;
+
+// Image position (centered)
 constexpr Uint16 IMAGE_X = ((WINDOW_WIDTH / 2) + IMAGE_WIDTH / 2) - IMAGE_WIDTH;
 constexpr Uint16 IMAGE_Y =
     (WINDOW_HEIGHT / 2) + (IMAGE_HEIGHT / 2) - IMAGE_HEIGHT;
@@ -39,6 +43,9 @@ constexpr Uint16 IMAGE_Y =
 // Logo position (should be bottom right) with some spacing
 constexpr Uint16 LOGO_X = WINDOW_WIDTH - LOGO_WIDTH - 50;
 constexpr Uint16 LOGO_Y = WINDOW_HEIGHT - LOGO_HEIGHT - 50;
+
+// Test weight (should be present when told to)
+constexpr int TEST_WEIGHT = 1994;
 
 /**
  *
@@ -55,8 +62,12 @@ private:
   sdl_unique<SDL_Window> window;
   sdl_unique<SDL_Surface> surface;
   sdl_unique<SDL_Renderer> renderer;
-  sdl_unique<SDL_Texture> logo;
-  sdl_unique<SDL_Texture> image;
+  sdl_unique<SDL_Texture> logo;   // Texture for logo (always visible)
+  sdl_unique<SDL_Texture> image;  // Texture for QR code
+  sdl_unique<SDL_Texture> weight; // Texture for weight
+
+  // Pointer for retrieving a font.
+  sdl_unique<TTF_Font> font;
 
   //  Used for debugging, probably not needed later
   std::queue<SDL_Event> events;
@@ -83,10 +94,12 @@ public:
 
   // Image and Logo are SDL_Surfaces
   SDLError loadSurfaceOfIMG(const char *filepath);
+  SDLError loadSurfaceOfFont(const char *filepath, int weight);
 
-  // Requires an SDL_Surface (image).
+  // Can probably be combined into one??
   SDLError createImageTexture(SDL_Surface *surface);
   SDLError createLogoTexture(SDL_Surface *surface);
+  SDLError createFontTexture(SDL_Surface *surface);
 
   // Get raw instance pointers
   SDL_Window *getRawWindow() const;
@@ -94,11 +107,12 @@ public:
   SDL_Surface *getRawSurface() const;
   SDL_Texture *getRawImage() const;
   SDL_Texture *getRawLogo() const;
+  SDL_Texture *getRawWeight() const;
+  TTF_Font *getRawFont() const;
 
   // Image functions
-  int loadLogo();
   int loadImage();
-  void presentWindow();
+  void presentWindow(bool font);
 
   /**
    * @brief wrapper around sdl clear and draw color.

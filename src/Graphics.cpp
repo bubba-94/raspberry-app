@@ -30,16 +30,17 @@ SDLError SDLManager::init() {
   if (createWindow() == SDLError::NONE && createRenderer() == SDLError::NONE) {
   }
 
-  // Load qr image
-  loadSurfaceOfIMG(IMAGE);
-  createImageTexture(getRawSurface());
-
-  // Load logo
+  // Load logo into memory
   loadSurfaceOfIMG(LOGO);
   createLogoTexture(getRawSurface());
 
-  // createImageSurface(IMAGE);
-  // createTextureOfImage(getRawImage());
+  // Load qr image into  memory
+  loadSurfaceOfIMG(IMAGE);
+  createImageTexture(getRawSurface());
+
+  // Load font into memory
+  loadSurfaceOfFont(FONT, TEST_WEIGHT);
+  createFontTexture(getRawSurface());
 
   // Shutdown if not initialized correctly.
   if (state == false) {
@@ -52,18 +53,25 @@ SDLError SDLManager::init() {
   return SDLError::NONE;
 }
 
-void SDLManager::presentWindow() {
+void SDLManager::presentWindow(bool font) {
 
-  setRenderingColor(22, 100, 200);
+  setRenderingColor(0, 0, 0);
 
   // Set the cursor and sizes of both surfaces.
-  SDL_Rect logoFrame, imageFrame;
+  SDL_Rect logoFrame, imageFrame, fontFrame;
   logoFrame = {LOGO_X, LOGO_Y, LOGO_WIDTH, LOGO_HEIGHT};
+  fontFrame = {FONT_X, FONT_Y, FONT_WIDTH, FONT_HEIGHT};
   imageFrame = {IMAGE_X, IMAGE_Y, IMAGE_WIDTH, IMAGE_HEIGHT};
 
-  // Include
+  // Always show logo
+
+  // If parameter is true, show number else show QR image
+  if (font) {
+    SDL_RenderCopy(getRawRenderer(), getRawWeight(), NULL, &fontFrame);
+  } else {
+    SDL_RenderCopy(getRawRenderer(), getRawImage(), NULL, &imageFrame);
+  }
   SDL_RenderCopy(getRawRenderer(), getRawLogo(), NULL, &logoFrame);
-  SDL_RenderCopy(getRawRenderer(), getRawImage(), NULL, &imageFrame);
 
   SDL_RenderPresent(getRawRenderer());
 }
@@ -74,6 +82,7 @@ void SDLManager::shutdown() {
   TTF_Quit();
   IMG_Quit();
   SDL_Quit();
+  std::exit(1);
 }
 
 void SDLManager::printErrMsg(const char *errMsg) {
@@ -143,9 +152,45 @@ SDLError SDLManager::createLogoTexture(SDL_Surface *surface) {
   return SDLError::NONE;
 }
 
+SDLError SDLManager::createFontTexture(SDL_Surface *surface) {
+
+  // Texture of a font surface
+  weight.reset(SDL_CreateTextureFromSurface(getRawRenderer(), surface));
+
+  if (!weight) {
+    printErrMsg(SDL_GetError());
+    return SDLError::FONT_ERR;
+  }
+
+  return SDLError::NONE;
+}
+
 // Imaging
 SDLError SDLManager::loadSurfaceOfIMG(const char *filepath) {
   surface.reset(IMG_Load(filepath));
+
+  if (!surface) {
+    printErrMsg(SDL_GetError());
+    return SDLError::SURFACE_ERR;
+  }
+  return SDLError::NONE;
+}
+
+SDLError SDLManager::loadSurfaceOfFont(const char *filepath, int weight) {
+
+  SDL_Color color{255, 255, 255, 255};
+
+  font.reset(TTF_OpenFont(filepath, 400));
+
+  if (!font) {
+    printErrMsg(SDL_GetError());
+    return SDLError::FONT_ERR;
+  }
+
+  std::string text = std::to_string(weight);
+  const char *weightConverted = text.c_str();
+
+  surface.reset(TTF_RenderUTF8_Solid(getRawFont(), weightConverted, color));
 
   if (!surface) {
     printErrMsg(SDL_GetError());
@@ -179,6 +224,8 @@ SDL_Renderer *SDLManager::getRawRenderer() const { return renderer.get(); }
 SDL_Surface *SDLManager::getRawSurface() const { return surface.get(); }
 SDL_Texture *SDLManager::getRawImage() const { return image.get(); }
 SDL_Texture *SDLManager::getRawLogo() const { return logo.get(); }
+SDL_Texture *SDLManager::getRawWeight() const { return weight.get(); }
+TTF_Font *SDLManager::getRawFont() const { return font.get(); }
 
 void SDLManager::setRenderingColor(Uint8 r, Uint8 g, Uint8 b) {
   SDL_RenderClear(getRawRenderer());
