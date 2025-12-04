@@ -34,6 +34,8 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
 
     find_package(SDL2 REQUIRED)
     find_package(SDL2_image REQUIRED)
+    find_package(SDL2_ttf REQUIRED)
+
 
     message(STATUS ${ENDYELLOW})
 
@@ -47,12 +49,11 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
         "${SYSROOT}/usr/include/aarch64-linux-gnu/SDL2/"
     )
 
-    # SDL2 library in sysroot
     find_library(SDL2_LIBRARY
         NAMES SDL2
         HINTS "${SYSROOT}/usr/lib"
     )
-
+    
     find_path(SDL2_IMAGE_INCLUDE_DIR
         SDL_image.h
         HINTS 
@@ -62,6 +63,19 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
 
     find_library(SDL2_IMAGE_LIBRARY
         NAMES SDL2_image
+        HINTS "${SYSROOT}/usr/lib"
+    )
+
+    # SDL2 TTF library for fonts
+    find_path(SDL2_TTF_INCLUDE_DIR
+        SDL_ttf.h
+        HINTS 
+        "${SYSROOT}/usr/include/SDL2/"
+        "${SYSROOT}/usr/include/aarch64-linux-gnu/SDL2/"
+    )
+
+    find_library(SDL2_TTF_LIBRARY
+        NAMES SDL2_ttf
         HINTS "${SYSROOT}/usr/lib"
     )
 
@@ -76,6 +90,12 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
     set_target_properties(SDL2_image::SDL2_image PROPERTIES
         IMPORTED_LOCATION ${SDL2_IMAGE_LIBRARY}
         INTERFACE_INCLUDE_DIRECTORIES ${SDL2_IMAGE_INCLUDE_DIR}
+    )
+
+    add_library(SDL2_ttf::SDL2_ttf STATIC IMPORTED)
+    set_target_properties(SDL2_ttf::SDL2_ttf PROPERTIES
+        IMPORTED_LOCATION ${SDL2_TTF_LIBRARY}
+        INTERFACE_INCLUDE_DIRECTORIES ${SDL2_TTF_INCLUDE_DIR}
     )
     
     set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin/aarch64")
