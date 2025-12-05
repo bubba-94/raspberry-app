@@ -8,7 +8,7 @@
 #include <string>
 
 // File to keep this file
-#include "SDLTypes.hpp"
+#include "SDLManagerTypes.hpp"
 
 /// Windows specs
 constexpr Uint16 WINDOW_WIDTH = 1920;
