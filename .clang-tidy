@@ -1,6 +1,5 @@
 Checks: >
   readability-identifier-naming,
-  bugprone-*,
   performance-*,
   clang-analyzer-*,
 

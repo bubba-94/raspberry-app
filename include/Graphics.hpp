@@ -2,6 +2,7 @@
 #define GRAPHICS_HPP
 
 /// C++ Standard Library
+#include <cstring>
 #include <iostream>
 #include <memory>
 #include <queue>
@@ -23,8 +24,8 @@ constexpr const char *IMAGE =
 constexpr const char *FONT =
     "/home/moodin/coding/internship/raspberry-app/fonts/Lato-Light.ttf";
 
-// Surface sizes
-constexpr Uint16 FONT_WIDTH = 1000;
+// Surface size
+extern volatile int fontWidth;
 constexpr Uint16 FONT_HEIGHT = 500;
 constexpr Uint16 IMAGE_WIDTH = 500;
 constexpr Uint16 IMAGE_HEIGHT = 500;
@@ -32,7 +33,7 @@ constexpr Uint16 LOGO_WIDTH = 242;
 constexpr Uint16 LOGO_HEIGHT = 48;
 
 // Font position (centered)
-constexpr Uint16 FONT_X = ((WINDOW_WIDTH / 2) + FONT_WIDTH / 2) - FONT_WIDTH;
+extern volatile int fontX;
 constexpr Uint16 FONT_Y = ((WINDOW_HEIGHT / 2) + FONT_HEIGHT / 2) - FONT_HEIGHT;
 
 // Image position (centered)
@@ -40,12 +41,11 @@ constexpr Uint16 IMAGE_X = ((WINDOW_WIDTH / 2) + IMAGE_WIDTH / 2) - IMAGE_WIDTH;
 constexpr Uint16 IMAGE_Y =
     (WINDOW_HEIGHT / 2) + (IMAGE_HEIGHT / 2) - IMAGE_HEIGHT;
 
-// Logo position (should be bottom right) with some spacing
+// Logo position (bottom right) with some spacing
 constexpr Uint16 LOGO_X = WINDOW_WIDTH - LOGO_WIDTH - 50;
 constexpr Uint16 LOGO_Y = WINDOW_HEIGHT - LOGO_HEIGHT - 50;
 
-// Test weight (should be present when told to)
-constexpr int TEST_WEIGHT = 1994;
+constexpr int MAX_WEIGHT = 3000;
 
 /**
  *
@@ -58,7 +58,9 @@ constexpr int TEST_WEIGHT = 1994;
  */
 class SDLManager {
 private:
-  SDL_Rect frame;
+  SDL_Rect fontPosition;
+  SDL_Rect logoPosition;
+  SDL_Rect imagePosition;
   sdl_unique<SDL_Window> window;
   sdl_unique<SDL_Surface> surface;
   sdl_unique<SDL_Renderer> renderer;
@@ -86,7 +88,19 @@ public:
   /*-------------PRINTS-------------*/
   void printErrMsg(const char *errMsg);
 
-  /*-------------SDL SPECIFIC-------------*/
+  // Image functions
+  int loadImage();
+  void presentWindow(bool font, int weight);
+
+  // Checks
+  bool checkWeight(int weight);
+  int checkLengthInChar(int weight);
+
+  void setSurfacePosition(SDL_Rect *surface, Uint16 x, Uint16 y, Uint16 w,
+                          Uint16 h);
+  void setFontWidth(int weight);
+  void setRenderingColor(Uint8 r, Uint8 g, Uint8 b);
+  void drawImageFrame();
 
   // Creation of needed SDL instances
   SDLError createWindow();
@@ -94,7 +108,8 @@ public:
 
   // Image and Logo are SDL_Surfaces
   SDLError loadSurfaceOfIMG(const char *filepath);
-  SDLError loadSurfaceOfFont(const char *filepath, int weight);
+  SDLError loadFontSurface(const char *filepath, int startWeight);
+  SDLError updateFontSurface(const char *filepath, int newWeight);
 
   // Can probably be combined into one??
   SDLError createImageTexture(SDL_Surface *surface);
@@ -110,18 +125,10 @@ public:
   SDL_Texture *getRawWeight() const;
   TTF_Font *getRawFont() const;
 
-  // Image functions
-  int loadImage();
-  void presentWindow(bool font);
-
-  /**
-   * @brief wrapper around sdl clear and draw color.
-   * @param r amount of red
-   * @param g amount of green
-   * @param b amount of blue
-   */
-  void setRenderingColor(Uint8 r, Uint8 g, Uint8 b);
-  void drawImageFrame();
+  // Frames of different images
+  SDL_Rect getImageRect() const;
+  SDL_Rect getLogoRect() const;
+  SDL_Rect getFontRect() const;
 
   // Events, will not be used later
   bool getState();

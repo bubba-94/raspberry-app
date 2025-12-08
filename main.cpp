@@ -1,8 +1,9 @@
-#include "include/Graphics.hpp"
+#include "Graphics.hpp"
 
 int main() {
   SDLManager sdl;
   bool image = false;
+  int initialWeight = 0;
   sdl.init();
 
   while (sdl.getState()) {
@@ -27,17 +28,17 @@ int main() {
         break;
 
       case SDL_MOUSEBUTTONDOWN:
-        std::cout << "Mouse clicked at: " << e.button.x << ", " << e.button.y
-                  << '\n';
+        std::cout << "Switching texture: \n";
         image = !image;
         break;
       default:
         break;
       }
+      initialWeight++;
     }
 
-    sdl.presentWindow(image);
-    SDL_Delay(50);
+    sdl.presentWindow(image, initialWeight);
+    SDL_Delay(100);
   }
 
   sdl.shutdown();
