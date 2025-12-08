@@ -63,23 +63,14 @@ enum class SDLError : std::uint8_t {
 };
 
 /**
- * @brief Decide the size and location of an image (SDL_Surface)
- * @param x X-coordinate for cursor
- * @param y Y-coordinate for cursor
- * @param w Length of the box in x direction
- * @param h Length of the box in y direction
- * @param xpad Length of padding in relation to the width
- * @param ypad Length of padding in relation to the height
- *
- * @return Configuration for a SDL_Surface.
+ * @brief Decide the size and location of a SDL Surface
+ * @param color a,r,g,b for coloring of surface
+ * @param rect x,y,w,h cooridnates for the size and cursor
+ * @return Design for a surface
  */
-struct SDLImageSpec {
-  Uint16 x;
-  Uint16 y;
-  Uint16 w;
-  Uint16 h;
-  Uint16 xpad;
-  Uint16 ypad;
-};
+typedef struct SDLSurfaceSpec {
+  SDL_Color color;
+  SDL_Rect rect;
+} SDLSpec;
 
 #endif

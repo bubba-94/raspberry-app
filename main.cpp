@@ -2,10 +2,14 @@
 
 int main() {
   SDLManager sdl;
+
   bool image = false;
   int initialWeight = 0;
-  sdl.init();
 
+  sdl.init();
+  sdl.setup();
+
+  // While state is true.
   while (sdl.getState()) {
     // Queue for events
     sdl.poll();
@@ -34,11 +38,11 @@ int main() {
       default:
         break;
       }
-      initialWeight++;
     }
 
-    sdl.presentWindow(image, initialWeight);
-    SDL_Delay(100);
+    initialWeight++;
+
+    sdl.update(image, initialWeight);
   }
 
   sdl.shutdown();

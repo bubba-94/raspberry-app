@@ -25,7 +25,7 @@ constexpr const char *FONT =
     "/home/moodin/coding/internship/raspberry-app/fonts/Lato-Light.ttf";
 
 // Surface size
-extern volatile int fontWidth;
+extern volatile int fontWidth; // Will update during runtime
 constexpr Uint16 FONT_HEIGHT = 500;
 constexpr Uint16 IMAGE_WIDTH = 500;
 constexpr Uint16 IMAGE_HEIGHT = 500;
@@ -33,7 +33,7 @@ constexpr Uint16 LOGO_WIDTH = 242;
 constexpr Uint16 LOGO_HEIGHT = 48;
 
 // Font position (centered)
-extern volatile int fontX;
+extern volatile int fontX; // Will update during runtime
 constexpr Uint16 FONT_Y = ((WINDOW_HEIGHT / 2) + FONT_HEIGHT / 2) - FONT_HEIGHT;
 
 // Image position (centered)
@@ -58,9 +58,9 @@ constexpr int MAX_WEIGHT = 3000;
  */
 class SDLManager {
 private:
-  SDL_Rect fontPosition;
-  SDL_Rect logoPosition;
-  SDL_Rect imagePosition;
+  SDLSpec logoSpec;
+  SDLSpec qrSpec;
+  SDLSpec weightSpec;
   sdl_unique<SDL_Window> window;
   sdl_unique<SDL_Surface> surface;
   sdl_unique<SDL_Renderer> renderer;
@@ -75,14 +75,13 @@ private:
   std::queue<SDL_Event> events;
 
   /// @brief  Bool to track the state of manager
-  bool state = true;
+  bool status = true;
 
 public:
-  /**
-   * @brief Sets up the environment for the window.
-   * @return SDLError if failed
-   */
+  // Main logic
   SDLError init();
+  void setup();
+  void update(bool font, int weight);
   void shutdown();
 
   /*-------------PRINTS-------------*/
@@ -90,13 +89,13 @@ public:
 
   // Image functions
   int loadImage();
-  void presentWindow(bool font, int weight);
 
   // Checks
   bool checkWeight(int weight);
   int checkLengthInChar(int weight);
 
-  void setSurfacePosition(SDL_Rect *surface, Uint16 x, Uint16 y, Uint16 w,
+  // Setups
+  void setSurfacePosition(SDLSpec *surface, Uint16 x, Uint16 y, Uint16 w,
                           Uint16 h);
   void setFontWidth(int weight);
   void setRenderingColor(Uint8 r, Uint8 g, Uint8 b);
@@ -106,12 +105,12 @@ public:
   SDLError createWindow();
   SDLError createRenderer();
 
-  // Image and Logo are SDL_Surfaces
+  // Used for updating the weight
+  SDLError updateFontSurface(int newWeight);
+
+  // Image and Logo are SDL_Surfaces, called once in setup
   SDLError loadSurfaceOfIMG(const char *filepath);
   SDLError loadFontSurface(const char *filepath, int startWeight);
-  SDLError updateFontSurface(const char *filepath, int newWeight);
-
-  // Can probably be combined into one??
   SDLError createImageTexture(SDL_Surface *surface);
   SDLError createLogoTexture(SDL_Surface *surface);
   SDLError createFontTexture(SDL_Surface *surface);
@@ -126,9 +125,6 @@ public:
   TTF_Font *getRawFont() const;
 
   // Frames of different images
-  SDL_Rect getImageRect() const;
-  SDL_Rect getLogoRect() const;
-  SDL_Rect getFontRect() const;
 
   // Events, will not be used later
   bool getState();
