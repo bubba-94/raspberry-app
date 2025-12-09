@@ -58,9 +58,12 @@ constexpr int MAX_WEIGHT = 3000;
  */
 class SDLManager {
 private:
+  // Settings of surfaces
   SDLSpec logoSpec;
   SDLSpec qrSpec;
   SDLSpec weightSpec;
+
+  // Smart pointers for SDL instances
   sdl_unique<SDL_Window> window;
   sdl_unique<SDL_Surface> surface;
   sdl_unique<SDL_Renderer> renderer;
@@ -71,17 +74,20 @@ private:
   // Pointer for retrieving a font.
   sdl_unique<TTF_Font> font;
 
-  //  Used for debugging, probably not needed later
-  std::queue<SDL_Event> events;
-
-  /// @brief  Bool to track the state of manager
+  // Booleans for evaluation
   bool status = true;
+  bool showImage = true;
+
+  //  Used for debugging, probably not needed later
+  SDL_Event event; // Check for single event
+  std::queue<SDL_Event> events;
 
 public:
   // Main logic
   SDLError init();
+  void poll();
   void setup();
-  void update(bool font, int weight);
+  void update(int weight);
   void shutdown();
 
   /*-------------PRINTS-------------*/
@@ -93,6 +99,7 @@ public:
   // Checks
   bool checkWeight(int weight);
   int checkLengthInChar(int weight);
+  bool getStatus();
 
   // Setups
   void setSurfacePosition(SDLSpec *surface, Uint16 x, Uint16 y, Uint16 w,
@@ -124,12 +131,9 @@ public:
   SDL_Texture *getRawWeight() const;
   TTF_Font *getRawFont() const;
 
-  // Frames of different images
-
   // Events, will not be used later
-  bool getState();
-  void poll();
   bool hasEvent() const;
+  void pollEvents();
   SDL_Event getNext();
 };
 

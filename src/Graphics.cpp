@@ -64,7 +64,7 @@ void SDLManager::setup() {
   setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
 }
 
-void SDLManager::update(bool font, int newWeight) {
+void SDLManager::update(int newWeight) {
   SDL_RenderClear(getRawRenderer());
   bool check = checkWeight(newWeight);
 
@@ -76,7 +76,7 @@ void SDLManager::update(bool font, int newWeight) {
   }
 
   // Switch the rendering QR, or WEIGHT
-  if (font) {
+  if (showImage) {
     SDL_RenderCopy(getRawRenderer(), getRawWeight(), NULL, &weightSpec.rect);
   } else {
     SDL_RenderCopy(getRawRenderer(), getRawImage(), NULL, &qrSpec.rect);
@@ -266,24 +266,53 @@ int SDLManager::checkLengthInChar(int weight) {
   return length;
 }
 
-bool SDLManager::getState() { return status; }
+bool SDLManager::getStatus() { return status; }
 
 bool SDLManager::hasEvent() const { return !events.empty(); }
 
 // Event functions
-void SDLManager::poll() {
-  SDL_Event sdlEvent;
-  while (SDL_PollEvent(&sdlEvent)) {
-    events.push(sdlEvent);
+void SDLManager::poll() { pollEvents(); }
+
+void SDLManager::pollEvents() {
+
+  while (SDL_PollEvent(&event)) {
+
+    events.push(event);
+
+    while (hasEvent()) {
+
+      event = getNext();
+
+      switch (event.type) {
+
+      case SDL_QUIT:
+        std::cout << "Closing SDL Window " << '\n';
+        shutdown();
+        break;
+
+      case SDL_KEYDOWN:
+        showImage = !showImage;
+        std::cout << "Key pressed: " << SDL_GetKeyName(event.key.keysym.sym)
+                  << '\n';
+        break;
+
+      case SDL_MOUSEBUTTONDOWN:
+        std::cout << "Switching texture: \n";
+        showImage = !showImage;
+        break;
+      default:
+        break;
+      }
+    }
   }
 }
 
 SDL_Event SDLManager::getNext() {
   if (events.empty())
     return SDL_Event{}; // return empty event if none
-  SDL_Event e = events.front();
+  event = events.front();
   events.pop();
-  return e;
+  return event;
 }
 
 SDL_Window *SDLManager::getRawWindow() const { return window.get(); }
