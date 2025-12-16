@@ -18,11 +18,11 @@ constexpr const char *WINDOW_TITLE = "SDLManager Window";
 
 // Image paths ()
 constexpr const char *LOGO =
-    "/home/moodin/coding/internship/raspberry-app/img/pandema.png";
+    "/home/johan/Programs/pay-per-weigh/aarch64/img/pandema.png";
 constexpr const char *IMAGE =
-    "/home/moodin/coding/internship/raspberry-app/img/qr.png";
+    "/home/johan/Programs/pay-per-weigh/aarch64/img/qr.png";
 constexpr const char *FONT =
-    "/home/moodin/coding/internship/raspberry-app/fonts/Lato-Light.ttf";
+    "/home/johan/Programs/pay-per-weigh/aarch64/fonts/Lato-Light.ttf";
 
 // Surface size
 extern volatile int fontWidth; // Will update during runtime
