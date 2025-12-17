@@ -20,7 +20,7 @@
 #include <mutex>
 #include <thread>
 
-constexpr uint16_t DELAY = 20;
+constexpr uint16_t DELAY = 16;
 constexpr uint8_t BUFFER_LENGTH = 32;
 
 // Test port

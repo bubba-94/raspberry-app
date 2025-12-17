@@ -81,6 +81,7 @@ void SDLManager::update(int newWeight) {
   SDL_RenderCopy(getRawRenderer(), getRawLogo(), NULL, &logoSpec.rect);
 
   SDL_RenderPresent(getRawRenderer());
+  SDL_Delay(16);
 }
 
 void SDLManager::shutdown() {
@@ -320,7 +321,7 @@ void SDLManager::setSurfacePosition(SDLSpec *surface, Uint16 x, Uint16 y,
 }
 
 void SDLManager::setFontWidth(int weight) {
-  static int length = checkLengthInChar(weight);
+  int length = checkLengthInChar(weight);
 
   fontWidth = FONT_CHAR_SIZE * length;
 

@@ -125,8 +125,8 @@ private:
   sdl_unique<SDL_Texture> weight; // Texture for weight
   sdl_unique<TTF_Font> font;
 
-  int fontWidth; // Adjustable during runtime
-  int fontX;     // X cursor of font
+  int fontWidth = 0; // Adjustable during runtime
+  int fontX = 0;     // X cursor of font
 
   bool status = true;    // State of the SDL Window
   bool showImage = true; // State to decide what image is shown

@@ -30,7 +30,9 @@ build.sh will build and compile executables for both PC and Pi 5 and gather them
 
 To create a virtual pair of serial ports.
 ```bash
-u
+socat \
+  pty,raw,echo=0,link=/tmp/ttyRS232_A \
+  pty,raw,echo=0,link=/tmp/ttyRS232_B &
 ```
 
 
