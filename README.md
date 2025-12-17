@@ -28,6 +28,12 @@ build.sh will build and compile executables for both PC and Pi 5 and gather them
 - `./run.sh` from root repo to run the application.
 - Testing aarch64 binary on PC `ssh -X user@pi` to forward x11 and open a SDL terminal on the desktop.
 
+To create a virtual pair of serial ports.
+```bash
+u
+```
+
+
 ## Running
 
 ### Running on Pi

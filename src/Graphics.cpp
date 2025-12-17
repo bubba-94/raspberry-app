@@ -1,10 +1,5 @@
 #include "Graphics.hpp"
 
-// Start with 250 at 1 char integers
-// fontX is centered in realtion to the width
-volatile int fontWidth = 250;
-volatile int fontX = ((WINDOW_WIDTH / 2) + fontWidth / 2) - fontWidth;
-
 // Init calls all creations.
 SDLError SDLManager::init() {
 
@@ -168,18 +163,6 @@ SDLError SDLManager::createLogoTexture(SDL_Surface *surface) {
 
 SDLError SDLManager::createFontTexture(SDL_Surface *surface) {
 
-  // Texture of a font surface
-  /*
-   *
-   weight.reset(SDL_CreateTexture(
-    getRawRenderer(),
-    SDL_PIXELFORMAT_RGBA8888,
-    SDL_TEXTUREACCESS_STREAMING, // Allows direct pixel updates
-    FONT_WIDTH,
-    FONT_HEIGHT
-  ));
-  */
-
   weight.reset(SDL_CreateTextureFromSurface(getRawRenderer(), surface));
 
   if (!weight) {
@@ -316,14 +299,6 @@ SDL_Event SDLManager::getNext() {
   return event;
 }
 
-SDL_Window *SDLManager::getRawWindow() const { return window.get(); }
-SDL_Renderer *SDLManager::getRawRenderer() const { return renderer.get(); }
-SDL_Surface *SDLManager::getRawSurface() const { return surface.get(); }
-SDL_Texture *SDLManager::getRawImage() const { return image.get(); }
-SDL_Texture *SDLManager::getRawLogo() const { return logo.get(); }
-SDL_Texture *SDLManager::getRawWeight() const { return weight.get(); }
-TTF_Font *SDLManager::getRawFont() const { return font.get(); }
-
 void SDLManager::setRenderingColor(Uint8 r, Uint8 g, Uint8 b) {
   SDL_RenderClear(getRawRenderer());
   // Set a white window
@@ -345,26 +320,19 @@ void SDLManager::setSurfacePosition(SDLSpec *surface, Uint16 x, Uint16 y,
 }
 
 void SDLManager::setFontWidth(int weight) {
-  int length = checkLengthInChar(weight);
+  static int length = checkLengthInChar(weight);
 
-  // Change width and x cursor of font whenever every thousand integer value
-  if (length == 1) {
-    fontWidth = 250;
-    setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
-  }
-  if (length == 2) {
-    fontWidth = 250 * 2;
-    fontX = ((WINDOW_WIDTH / 2) + fontWidth / 2) - fontWidth;
-    setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
-  }
-  if (length == 3) {
-    fontWidth = 250 * 3;
-    fontX = ((WINDOW_WIDTH / 2) + fontWidth / 2) - fontWidth;
-    setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
-  }
-  if (length == 4) {
-    fontWidth = 250 * 4;
-    fontX = ((WINDOW_WIDTH / 2) + fontWidth / 2) - fontWidth;
-    setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
-  }
+  fontWidth = FONT_CHAR_SIZE * length;
+
+  fontX = ((WINDOW_WIDTH / 2) + fontWidth / 2) - fontWidth;
+
+  setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
 }
+
+SDL_Window *SDLManager::getRawWindow() const { return window.get(); }
+SDL_Renderer *SDLManager::getRawRenderer() const { return renderer.get(); }
+SDL_Surface *SDLManager::getRawSurface() const { return surface.get(); }
+SDL_Texture *SDLManager::getRawImage() const { return image.get(); }
+SDL_Texture *SDLManager::getRawLogo() const { return logo.get(); }
+SDL_Texture *SDLManager::getRawWeight() const { return weight.get(); }
+TTF_Font *SDLManager::getRawFont() const { return font.get(); }
