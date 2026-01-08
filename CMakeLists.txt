@@ -32,9 +32,35 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
         set(TOOLCHAIN_PRINTED TRUE CACHE INTERNAL "Prevent toolchain output twice")
     endif()
 
+    list(APPEND CMAKE_PREFIX_PATH 
+        ${SDL2_ttf_PATH} 
+        ${SDL2_image_PATH}
+    )
+
     find_package(SDL2 REQUIRED)
-    find_package(SDL2_image REQUIRED)
-    find_package(SDL2_ttf REQUIRED)
+
+    find_package(SDL2_image QUIET CONFIG)
+    if(NOT SDL2_image_FOUND)
+
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
+
+        add_library(SDL2_image::SDL2_image INTERFACE IMPORTED)
+        target_include_directories(SDL2_image::SDL2_image INTERFACE ${SDL2_IMAGE_INCLUDE_DIRS})
+        target_link_libraries(SDL2_image::SDL2_image INTERFACE ${SDL2_IMAGE_LIBRARIES})
+
+    endif()
+
+    find_package(SDL2_ttf QUIET CONFIG)
+    if(NOT SDL2_TTF_FOUND)
+
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
+
+        add_library(SDL2_ttf::SDL2_ttf INTERFACE IMPORTED)
+        target_include_directories(SDL2_ttf::SDL2_ttf INTERFACE ${SDL2_TTF_INCLUDE_DIRS})
+        target_link_libraries(SDL2_ttf::SDL2_ttf INTERFACE ${SDL2_TTF_LIBRARIES})
+    endif()
 
 
     message(STATUS ${ENDYELLOW})
