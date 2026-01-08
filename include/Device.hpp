@@ -20,11 +20,12 @@
 #include <mutex>
 #include <thread>
 
-constexpr uint16_t DELAY = 16;
+constexpr uint8_t DELAY = 16;
 constexpr uint8_t BUFFER_LENGTH = 32;
 
 // Test port
-constexpr const char *PORT_A = "/tmp/ttyRS232_A";
+constexpr const char *PORT_A = "/dev/ttyACM0";
+
 
 /**
  * @class Device
@@ -51,13 +52,13 @@ public:
   void poll();
 
   bool getState();
-  int getWeight();
+  uint16_t getWeight();
 
   void readFromSerial();
   bool connectToPort();
   void configureSerial(termios &settings, int baud);
   void operator()() const;
-  void sleepFor(uint16_t delay);
+  void sleepFor(uint8_t delay);
   void printErrMsg(const char *errMsg);
   uint16_t convertWeight();
 };

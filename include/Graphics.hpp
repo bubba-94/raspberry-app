@@ -18,11 +18,11 @@ constexpr const char *WINDOW_TITLE = "SDLManager Window";
 
 // Image paths ()
 constexpr const char *LOGO =
-    "/home/johan/Programs/pay-per-weigh/aarch64/img/pandema.png";
+    "/home/johandesktop/repos/raspberry-app/img/pandema.png";
 constexpr const char *IMAGE =
-    "/home/johan/Programs/pay-per-weigh/aarch64/img/qr.png";
+    "/home/johandesktop/repos/raspberry-app/img/qr.png";
 constexpr const char *FONT =
-    "/home/johan/Programs/pay-per-weigh/aarch64/fonts/Lato-Light.ttf";
+    "/home/johandesktop/repos/raspberry-app/fonts/Lato-Light.ttf";
 
 // Surface size
 constexpr Uint16 FONT_CHAR_SIZE = 250;
@@ -43,7 +43,7 @@ constexpr Uint16 IMAGE_Y =
 // Logo position (bottom right) with some spacing
 constexpr Uint16 LOGO_X = WINDOW_WIDTH - LOGO_WIDTH - 50;
 constexpr Uint16 LOGO_Y = WINDOW_HEIGHT - LOGO_HEIGHT - 50;
-constexpr int MAX_WEIGHT = 15000;
+constexpr int MAX_WEIGHT = 15001;
 
 /**
  *

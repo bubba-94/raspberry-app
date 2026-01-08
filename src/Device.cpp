@@ -42,7 +42,6 @@ void Device::readFromSerial() {
     } else {
       incomingWeight += c;
     }
-    sleepFor(DELAY);
   }
 }
 
@@ -67,6 +66,9 @@ bool Device::connectToPort() {
     std::cout << "Saving new setting not successful";
     return -1;
   }
+
+  std::cout << PORT_A << "is open." << "\n";
+
   return true;
 }
 
@@ -99,11 +101,11 @@ void Device::configureSerial(termios &settings, int baud) {
   cfsetospeed(&settings, baud);
 }
 
-void Device::sleepFor(uint16_t delay) {
+void Device::sleepFor(uint8_t delay) {
   std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 }
 
-int Device::getWeight() { return weight; }
+uint16_t Device::getWeight() { return weight; }
 
 uint16_t Device::convertWeight() {
   weight = std::stoi(incomingWeight);
