@@ -32,7 +32,51 @@ To create a virtual pair of serial ports.
 ```bash
 socat \
   pty,raw,echo=0,link=/tmp/ttyRS232_A \
-  pty,raw,echo=0,link=/tmp/ttyRS232_B &
+  pty,raw,echo=0,link=/tmp/ttyRS232_B &'
+```
+
+### Test programs for writing analog value to serial
+```cpp
+#include <Arduino.h>
+
+constexpr int POT = A0;
+
+constexpr int ANALOG_MIN = 0;
+constexpr int ANALOG_MAX = 1023;
+constexpr int WEIGHT_MIN = 0;
+constexpr int WEIGHT_MAX = 15000;
+
+int readValue = 0;
+int convValue = 0;
+
+int readPot();
+
+void setup()
+{
+    Serial.begin(9600);
+    while (!Serial){}
+}
+
+void loop()
+{
+    readValue = readPot();
+    convValue = map(readValue, ANALOG_MIN, ANALOG_MAX, WEIGHT_MIN, WEIGHT_MAX);
+
+    Serial.println(convValue);
+    delay(16);
+}
+
+int readPot() {
+    long sum = 0;
+    const int samples = 100;
+
+    for (int i = 0; i < samples; i++) {
+        sum += analogRead(POT);
+        delayMicroseconds(300);
+    }
+
+    return sum / samples;
+}
 ```
 
 
