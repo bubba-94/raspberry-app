@@ -67,6 +67,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
 
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
 
+    add_definitions(-DRPI5)
     # Locate _real_config.h
     find_path(SDL2_INCLUDE_DIR
         SDL.h

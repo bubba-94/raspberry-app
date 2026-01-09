@@ -3,6 +3,7 @@ add_library(${ARCHIVE}
        Graphics.cpp
        QRManager.cpp
        Device.cpp
+       Gpio.cpp
 )
 
 target_include_directories(${ARCHIVE}
