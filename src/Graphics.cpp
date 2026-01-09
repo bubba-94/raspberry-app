@@ -103,7 +103,7 @@ SDLError SDLManager::createWindow() {
   window.reset(SDL_CreateWindow(
       WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
       WINDOW_WIDTH, WINDOW_HEIGHT,
-      SDL_WINDOW_SHOWN ));
+      SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN));
 
   if (!window) {
     printErrMsg(SDL_GetError());

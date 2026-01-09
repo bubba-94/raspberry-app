@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(SDL2APP LANGUAGES CXX)
+project(PAY-PER-WEIGH LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g")
@@ -8,9 +8,9 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-    set(ARCHIVE _sdl2pi5)
+    set(ARCHIVE _ppw-pi5)
 else()
-    set(ARCHIVE _sdl2x86)
+    set(ARCHIVE _ppw-x86)
 endif()
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
@@ -33,8 +33,8 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     endif()
 
     list(APPEND CMAKE_PREFIX_PATH 
-        ${SDL2_ttf_PATH} 
         ${SDL2_image_PATH}
+        ${SDL2_ttf_PATH} 
     )
 
     find_package(SDL2 REQUIRED)
@@ -52,7 +52,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     endif()
 
     find_package(SDL2_ttf QUIET CONFIG)
-    if(NOT SDL2_TTF_FOUND)
+    if(NOT SDL2_ttf_FOUND)
 
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
@@ -162,7 +162,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 add_subdirectory(${SRC_DIR} sdl2-archive)
 
 # Executable
-add_executable(sdl2-app main.cpp)
+add_executable(pay-per-weigh main.cpp)
 
 # Link the library defined in src/CMakeLists.txt
-target_link_libraries(sdl2-app PRIVATE ${ARCHIVE}) 
+target_link_libraries(pay-per-weigh PRIVATE ${ARCHIVE}) 

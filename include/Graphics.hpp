@@ -11,18 +11,18 @@
 // File to keep this file
 #include "SDLManagerTypes.hpp"
 
-/// Windows specs
+/// Windows specs for Raspberry Pi Monitor
 constexpr Uint16 WINDOW_WIDTH = 1920;
 constexpr Uint16 WINDOW_HEIGHT = 1080;
-constexpr const char *WINDOW_TITLE = "SDLManager Window";
+constexpr const char *WINDOW_TITLE = "Pay Per Weigh";
 
 // Image paths ()
 constexpr const char *LOGO =
-    "/home/johandesktop/repos/raspberry-app/img/pandema.png";
+    "/home/johan/Programs/pay-per-weigh/aarch64/img/pandema.png";
 constexpr const char *IMAGE =
-    "/home/johandesktop/repos/raspberry-app/img/qr.png";
+    "/home/johan/Programs/pay-per-weigh/aarch64/img/qr.png";
 constexpr const char *FONT =
-    "/home/johandesktop/repos/raspberry-app/fonts/Lato-Light.ttf";
+    "/home/johan/Programs/pay-per-weigh/aarch64/fonts/Lato-Light.ttf";
 
 // Surface size
 constexpr Uint16 FONT_CHAR_SIZE = 250;
