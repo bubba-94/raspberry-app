@@ -59,7 +59,7 @@ void SDLManager::setup() {
   setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
 }
 
-void SDLManager::update(int newWeight) {
+void SDLManager::render(int newWeight) {
   SDL_RenderClear(getRawRenderer());
   bool check = checkWeight(newWeight);
 

@@ -3,6 +3,7 @@
 
 /// C++ Standard Library
 #include <cstring>
+#include <gpiod.h>
 #include <iostream>
 #include <memory>
 #include <queue>
@@ -61,7 +62,7 @@ public:
   SDLError init();
   void poll();
   void setup();
-  void update(int weight);
+  void render(int weight);
   void shutdown();
 
   /*-------------PRINTS-------------*/

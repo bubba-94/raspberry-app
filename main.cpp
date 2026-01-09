@@ -13,8 +13,9 @@ int main() {
   // While state is true.
   while (sdl.getStatus()) {
 
+    //
     sdl.poll();
-    sdl.update(currentWeight);
+    sdl.render(currentWeight);
     currentWeight = pi.getWeight();
   }
 
