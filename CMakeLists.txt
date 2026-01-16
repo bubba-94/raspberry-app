@@ -127,6 +127,18 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
         IMPORTED_LOCATION ${SDL2_TTF_LIBRARY}
         INTERFACE_INCLUDE_DIRECTORIES ${SDL2_TTF_INCLUDE_DIR}
     )
+
+    find_library(GPIOD_CXX_LIBRARY
+        NAMES gpiodcxx
+        HINTS "${SYSROOT}/usr/lib/aarch64-linux-gnu" 
+        NO_DEFAULT_PATH
+        )
+
+    find_library(GPIOD_C_LIBRARY
+        NAMES gpiod
+        HINTS "${SYSROOT}/usr/lib/aarch64-linux-gnu" 
+        NO_DEFAULT_PATH
+        )
     
     set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin/aarch64")
     
@@ -170,3 +182,7 @@ add_executable(pay-per-weigh main.cpp)
 
 # Link the library defined in src/CMakeLists.txt
 target_link_libraries(pay-per-weigh PRIVATE ${ARCHIVE})
+
+if(RPI)
+    target_link_libraries(pay-per-weigh PRIVATE ${GPIOD_CXX_LIBRARY} ${GPIOD_C_LIBRARY})
+endif()
