@@ -67,7 +67,7 @@ bool Device::connectToPort() {
     return -1;
   }
 
-  std::cout << PORT_A << "is open." << "\n";
+  std::cout << PORT_A << " is open." << "\n";
 
   return true;
 }
