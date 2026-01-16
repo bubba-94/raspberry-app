@@ -15,16 +15,27 @@
 /// Windows specs for Raspberry Pi Monitor
 constexpr Uint16 WINDOW_WIDTH = 1920;
 constexpr Uint16 WINDOW_HEIGHT = 1080;
-constexpr const char *WINDOW_TITLE = "Pay Per Weigh";
 
 // Image paths ()
+#ifdef RPI
 constexpr const char *LOGO =
     "/home/johan/Programs/pay-per-weigh/aarch64/img/pandema.png";
 constexpr const char *IMAGE =
     "/home/johan/Programs/pay-per-weigh/aarch64/img/qr.png";
 constexpr const char *FONT =
     "/home/johan/Programs/pay-per-weigh/aarch64/fonts/Lato-Light.ttf";
+constexpr const char *WINDOW_TITLE = "Pay Per Weigh";
 
+#else
+constexpr const char *LOGO =
+    "/home/moodin/coding/internship/raspberry-app/img/pandema.png";
+constexpr const char *IMAGE =
+    "/home/moodin/coding/internship/raspberry-app/img/qr.png";
+constexpr const char *FONT =
+    "/home/moodin/coding/internship/raspberry-app/fonts/Lato-Light.ttf";
+constexpr const char *WINDOW_TITLE = "Desktop Test";
+
+#endif
 // Surface size
 constexpr Uint16 FONT_CHAR_SIZE = 250;
 constexpr Uint16 FONT_HEIGHT = 500;

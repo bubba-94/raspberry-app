@@ -99,11 +99,17 @@ void SDLManager::printErrMsg(const char *errMsg) {
 }
 
 SDLError SDLManager::createWindow() {
-  // Defaulted window specs
+// Defaulted window specs
+#ifdef RPI
   window.reset(SDL_CreateWindow(
       WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
       WINDOW_WIDTH, WINDOW_HEIGHT,
       SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN));
+#else
+  window.reset(SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED,
+                                SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH,
+                                WINDOW_HEIGHT, SDL_WINDOW_SHOWN));
+#endif
 
   if (!window) {
     printErrMsg(SDL_GetError());
