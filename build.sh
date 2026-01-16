@@ -26,7 +26,8 @@ mkdir -p "$PI_DIR"
 
 echo "Configuring and building for aarch64..."
 cd "$PI_DIR" || exit 1
-cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+cmake -DRPI=ON \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
       -DCMAKE_TOOLCHAIN_FILE=../toolchain-aarch64.cmake \
       -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ..
 cmake --build .

@@ -4,6 +4,10 @@ project(PAY-PER-WEIGH LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g")
 
+if(RPI)
+    add_compile_definitions(RPI)
+endif()
+
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
@@ -67,7 +71,6 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
 
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
 
-    add_definitions(-DRPI5)
     # Locate _real_config.h
     find_path(SDL2_INCLUDE_DIR
         SDL.h
@@ -166,4 +169,4 @@ add_subdirectory(${SRC_DIR} sdl2-archive)
 add_executable(pay-per-weigh main.cpp)
 
 # Link the library defined in src/CMakeLists.txt
-target_link_libraries(pay-per-weigh PRIVATE ${ARCHIVE}) 
+target_link_libraries(pay-per-weigh PRIVATE ${ARCHIVE})
