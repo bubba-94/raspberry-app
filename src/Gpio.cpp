@@ -18,12 +18,17 @@ int GpioPi::init() {
 
   auto builder = chip.prepare_request();
   builder.add_line_settings(
-      gpiod::line::offset{static_cast<unsigned int>(Pin::KEY_SWITCH)},
+      gpiod::line::offset{static_cast<unsigned int>(LogicalPin::KEY)},
+      settings);
+  builder.add_line_settings(
+      gpiod::line::offset{static_cast<unsigned int>(LogicalPin::SHUTDOWN)},
       settings);
 
   request = builder.do_request();
 
-  std::cout << "Offset " << static_cast<unsigned int>(Pin::KEY_SWITCH)
+  std::cout << "Offset " << static_cast<unsigned int>(LogicalPin::KEY)
+            << " initialized\n";
+  std::cout << "Offset" << static_cast<unsigned int>(LogicalPin::SHUTDOWN)
             << " initialized\n";
   return 0;
 }
@@ -42,27 +47,50 @@ void GpioPi::poll() {
   request->read_edge_events(buffer);
 
   for (const auto &event : buffer) {
-    if (event.line_offset() == static_cast<unsigned int>(Pin::KEY_SWITCH)) {
+    //   if (event.line_offset() == static_cast<unsigned int>(Pin::KEY_SWITCH))
+    //   {
 
-      if (event.type() == gpiod::edge_event::event_type::RISING_EDGE) {
-        keyState = true;
-      } else {
-        keyState = false;
-      }
+    //     if (event.type() == gpiod::edge_event::event_type::RISING_EDGE) {
+    //       keyState = true;
+    //     } else {
+    //       keyState = false;
+    //     }
+    //   }
+
+    auto pin = static_cast<unsigned int>(event.line_offset());
+
+    switch (pin) {
+    case static_cast<unsigned int>(LogicalPin::SHUTDOWN):
+      shutdown(event);
+      break;
+    case static_cast<unsigned int>(LogicalPin::KEY):
+      toggleKey(event);
+      break;
     }
   }
 }
 
-bool GpioPi::getState() { return keyState; }
-
-void GpioPi::toggleKey(bool toggle) {
-  toggle = !toggle;
-  if (toggle) {
-    std::cout << "Line " << toggle;
+void GpioPi::shutdown(gpiod::edge_event event) {
+  auto rising = gpiod::edge_event::event_type::RISING_EDGE;
+  if (event.type() == rising) {
+    buttonState = true;
   } else {
-    std::cout << "Line " << toggle;
+    buttonState = false;
   }
 }
+
+void GpioPi::toggleKey(gpiod::edge_event event) {
+  auto rising = gpiod::edge_event::event_type::RISING_EDGE;
+
+  if (event.type() == rising) {
+    keyState = true;
+  } else {
+    keyState = false;
+  }
+}
+
+bool GpioPi::getKeyState() { return keyState; }
+bool GpioPi::getButtonState() { return buttonState; }
 
 #else
 

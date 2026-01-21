@@ -85,4 +85,4 @@ int readPot() {
 ### Running on Pi
 
 - Binary with the library is needed
-- Run `scp -r bin/aarch64 user@pi:Programs/pay-per-weigh` to copy binary and library to Pi.
+- Run `scp -r bin/aarch64 user@pi:Programs/pay-per-weigh/` to copy binary and library to Pi.

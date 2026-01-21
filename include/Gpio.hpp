@@ -12,7 +12,6 @@ public:
   virtual ~GpioInterface() {}
   virtual int init() = 0;
   virtual int setup() = 0;
-  virtual void toggleKey(bool toggle) = 0;
 };
 
 #ifdef RPI
@@ -35,18 +34,23 @@ private:
   gpiod::line_settings settings;
   std::optional<gpiod::line_request> request;
   bool keyState = false;
+  bool buttonState = false;
 
 public:
   GpioPi();
   int init() override;
   int setup() override;
   void poll();
-  void toggleKey(bool toggle) override;
-  bool getState();
+  void shutdown(gpiod::edge_event event);
+  void toggleKey(gpiod::edge_event event);
+  bool getKeyState();
+  bool getButtonState();
 };
 
-enum class Pin : unsigned int {
-  KEY_SWITCH = 17,
+// Logical number of pin https://pinout.xyz/pinout/pin29_gpio5/
+enum class LogicalPin : unsigned int {
+  KEY = 17,
+  SHUTDOWN = 27,
 };
 
 #else
@@ -60,7 +64,7 @@ public:
   GpioMock();
   int init() override;
   int setup() override;
-  void toggleKey(bool toggle) override;
+  void toggleKey(bool toggle);
 };
 // End RPI definition
 #endif
