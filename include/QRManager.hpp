@@ -4,10 +4,9 @@
 #include <iostream>
 #include <vector>
 
-class QRManager{
-    private:
-    public:
-    
+class QRManager {
+private:
+public:
 };
 
 #endif

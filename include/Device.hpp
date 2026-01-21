@@ -26,7 +26,6 @@ constexpr uint8_t BUFFER_LENGTH = 32;
 // Test port
 constexpr const char *PORT_A = "/dev/ttyACM0";
 
-
 /**
  * @class Device
  * @brief Class for handling the Raspberry Pi weight generating

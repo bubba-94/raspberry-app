@@ -13,6 +13,7 @@ int main() {
 #endif
 
   int currentWeight{0};
+
   sdl.init();
   sdl.setup();
   pi.init();
@@ -24,7 +25,7 @@ int main() {
 #ifdef RPI
     currentWeight = pi.getWeight();
     gpio.poll();
-    sdl.poll(gpio.getState());
+    sdl.poll(gpio.getKeyState(), gpio.getButtonState());
 #else
     sdl.pollEvents();
     currentWeight = 1337;
