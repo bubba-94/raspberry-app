@@ -16,6 +16,7 @@ set(CMAKE_SYSROOT_COMPILE "${SYSROOT}")
 set(CMAKE_SYSROOT_LINK "${SYSROOT}")
 
 # Force flags
+set(RPI TRUE)
 set(CMAKE_C_FLAGS "--sysroot=${SYSROOT} ${CMAKE_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "--sysroot=${SYSROOT} ${CMAKE_CXX_FLAGS}")
 

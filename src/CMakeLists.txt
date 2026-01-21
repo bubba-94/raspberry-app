@@ -1,14 +1,14 @@
 add_library(${ARCHIVE}
     STATIC 
        Graphics.cpp
+       QRManager.cpp
+       Device.cpp
+       Gpio.cpp
 )
 
 target_include_directories(${ARCHIVE}
     PUBLIC
         ${INCLUDE_DIR}
-        ${SDL2_INCLUDE_DIR}
-        ${SDL2_IMAGE_INCLUDE_DIR}
-        ${SDL2_TTF_INCLUDE_DIR}
 )
 
 target_link_libraries(${ARCHIVE}

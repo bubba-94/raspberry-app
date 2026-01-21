@@ -1,16 +1,20 @@
 cmake_minimum_required(VERSION 3.15)
-project(SDL2APP LANGUAGES CXX)
+project(PAY-PER-WEIGH LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -g")
+
+if(RPI)
+    add_compile_definitions(RPI)
+endif()
 
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-    set(ARCHIVE _sdl2pi5)
+    set(ARCHIVE _ppw-pi5)
 else()
-    set(ARCHIVE _sdl2x86)
+    set(ARCHIVE _ppw-x86)
 endif()
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
@@ -32,9 +36,35 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
         set(TOOLCHAIN_PRINTED TRUE CACHE INTERNAL "Prevent toolchain output twice")
     endif()
 
+    list(APPEND CMAKE_PREFIX_PATH 
+        ${SDL2_image_PATH}
+        ${SDL2_ttf_PATH} 
+    )
+
     find_package(SDL2 REQUIRED)
-    find_package(SDL2_image REQUIRED)
-    find_package(SDL2_ttf REQUIRED)
+
+    find_package(SDL2_image QUIET CONFIG)
+    if(NOT SDL2_image_FOUND)
+
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
+
+        add_library(SDL2_image::SDL2_image INTERFACE IMPORTED)
+        target_include_directories(SDL2_image::SDL2_image INTERFACE ${SDL2_IMAGE_INCLUDE_DIRS})
+        target_link_libraries(SDL2_image::SDL2_image INTERFACE ${SDL2_IMAGE_LIBRARIES})
+
+    endif()
+
+    find_package(SDL2_ttf QUIET CONFIG)
+    if(NOT SDL2_ttf_FOUND)
+
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
+
+        add_library(SDL2_ttf::SDL2_ttf INTERFACE IMPORTED)
+        target_include_directories(SDL2_ttf::SDL2_ttf INTERFACE ${SDL2_TTF_INCLUDE_DIRS})
+        target_link_libraries(SDL2_ttf::SDL2_ttf INTERFACE ${SDL2_TTF_LIBRARIES})
+    endif()
 
 
     message(STATUS ${ENDYELLOW})
@@ -97,6 +127,18 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
         IMPORTED_LOCATION ${SDL2_TTF_LIBRARY}
         INTERFACE_INCLUDE_DIRECTORIES ${SDL2_TTF_INCLUDE_DIR}
     )
+
+    find_library(GPIOD_CXX_LIBRARY
+        NAMES gpiodcxx
+        HINTS "${SYSROOT}/usr/lib/aarch64-linux-gnu" 
+        NO_DEFAULT_PATH
+        )
+
+    find_library(GPIOD_C_LIBRARY
+        NAMES gpiod
+        HINTS "${SYSROOT}/usr/lib/aarch64-linux-gnu" 
+        NO_DEFAULT_PATH
+        )
     
     set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin/aarch64")
     
@@ -136,7 +178,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 add_subdirectory(${SRC_DIR} sdl2-archive)
 
 # Executable
-add_executable(sdl2-app main.cpp)
+add_executable(pay-per-weigh main.cpp)
 
 # Link the library defined in src/CMakeLists.txt
-target_link_libraries(sdl2-app PRIVATE ${ARCHIVE}) 
+target_link_libraries(pay-per-weigh PRIVATE ${ARCHIVE})
+
+if(RPI)
+    target_link_libraries(pay-per-weigh PRIVATE ${GPIOD_CXX_LIBRARY} ${GPIOD_C_LIBRARY})
+endif()

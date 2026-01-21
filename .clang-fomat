@@ -1,7 +1,7 @@
 # Base style
 BasedOnStyle: Allman
 IndentWidth: 4
-ColumnLimit: 80
+ColumnLimit: 100
 UseTab: Space
 
 # Braces
