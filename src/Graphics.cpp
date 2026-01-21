@@ -262,7 +262,12 @@ bool SDLManager::getStatus() { return status; }
 bool SDLManager::hasEvent() const { return !events.empty(); }
 
 // Event functions
-void SDLManager::poll(bool state) { showImage = state; }
+void SDLManager::poll(bool keyState, bool buttonState) {
+  showImage = keyState;
+  if (buttonState) {
+    shutdown();
+  }
+}
 
 void SDLManager::pollEvents() {
 

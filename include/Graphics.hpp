@@ -70,7 +70,7 @@ class SDLManager {
 public:
   // Main logic
   SDLError init();
-  void poll(bool state);
+  void poll(bool keyState, bool buttonState);
   void setup();
   void render(int weight);
   void shutdown();
