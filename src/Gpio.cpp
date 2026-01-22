@@ -16,81 +16,60 @@ int GpioPi::init() {
   settings.set_edge_detection(gpiod::line::edge::BOTH);
   settings.set_active_low(false);
 
-  auto builder = chip.prepare_request();
-  builder.add_line_settings(
-      gpiod::line::offset{static_cast<unsigned int>(LogicalPin::KEY)},
-      settings);
-  builder.add_line_settings(
-      gpiod::line::offset{static_cast<unsigned int>(LogicalPin::SHUTDOWN)},
-      settings);
+  gpiod::request_builder builder = chip.prepare_request();
+
+  setup(builder);
 
   request = builder.do_request();
 
   std::cout << "Offset " << static_cast<unsigned int>(LogicalPin::KEY)
             << " initialized\n";
-  std::cout << "Offset" << static_cast<unsigned int>(LogicalPin::SHUTDOWN)
+  std::cout << "Offset " << static_cast<unsigned int>(LogicalPin::SHUTDOWN)
             << " initialized\n";
   return 0;
 }
 
-int GpioPi::setup() { return 0; }
+void GpioPi::setup(gpiod::request_builder builder) { 
+
+  builder.add_line_settings(
+    gpiod::line::offset{static_cast<unsigned int>(LogicalPin::KEY)},
+    settings);
+  builder.add_line_settings(
+    gpiod::line::offset{static_cast<unsigned int>(LogicalPin::SHUTDOWN)},
+    settings);
+
+}
 
 void GpioPi::poll() {
-  if (!request)
-    return;
 
-  if (!request->wait_edge_events(std::chrono::milliseconds{0}))
+  if (!request || !request->wait_edge_events(std::chrono::milliseconds{0}))
     return;
 
   gpiod::edge_event_buffer buffer;
-
   request->read_edge_events(buffer);
 
+  // GPIO Event buffer
   for (const auto &event : buffer) {
-    //   if (event.line_offset() == static_cast<unsigned int>(Pin::KEY_SWITCH))
-    //   {
 
-    //     if (event.type() == gpiod::edge_event::event_type::RISING_EDGE) {
-    //       keyState = true;
-    //     } else {
-    //       keyState = false;
-    //     }
-    //   }
+    switch (static_cast<unsigned int>(event.line_offset())) {
 
-    auto pin = static_cast<unsigned int>(event.line_offset());
-
-    switch (pin) {
-    case static_cast<unsigned int>(LogicalPin::SHUTDOWN):
-      shutdown(event);
-      break;
-    case static_cast<unsigned int>(LogicalPin::KEY):
-      toggleKey(event);
-      break;
+      case LogicalPin::SHUTDOWN: handleShutdown(event); break;
+      case LogicalPin::KEY: handleKey(event); break;
+      
     }
   }
 }
 
-void GpioPi::shutdown(gpiod::edge_event event) {
-  auto rising = gpiod::edge_event::event_type::RISING_EDGE;
-  if (event.type() == rising) {
-    buttonState = true;
-  } else {
-    buttonState = false;
-  }
+void GpioPi::handleShutdown(const gpiod::edge_event &event) {
+  state.shutdownRequested = event.type() == gpiod::edge_event::RISING_EDGE;
 }
 
-void GpioPi::toggleKey(gpiod::edge_event event) {
-  auto rising = gpiod::edge_event::event_type::RISING_EDGE;
-
-  if (event.type() == rising) {
-    keyState = true;
-  } else {
-    keyState = false;
-  }
+void GpioPi::handleKey(const gpiod::edge_event &event) {
+  state.keyEnabled = event.type() == gpiod::edge_event::RISING_EDGE;
 }
 
-bool GpioPi::getKeyState() { return keyState; }
-bool GpioPi::getButtonState() { return buttonState; }
+const PinState GpioPi::getState() const { return state; }
+
 
 #else
 

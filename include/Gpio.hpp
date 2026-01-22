@@ -22,6 +22,8 @@ public:
 #include <optional>
 #include <stddef.h>
 
+#include "PinState.hpp"
+
 constexpr size_t NUM_PINS = 40;
 
 /**
@@ -33,18 +35,16 @@ private:
   std::filesystem::path PATH{"/dev/gpiochip4"};
   gpiod::line_settings settings;
   std::optional<gpiod::line_request> request;
-  bool keyState = false;
-  bool buttonState = false;
+  PinState state;
 
 public:
   GpioPi();
   int init() override;
-  int setup() override;
+  void setup(gpiod::request_builder &builder) override;
   void poll();
-  void shutdown(gpiod::edge_event event);
-  void toggleKey(gpiod::edge_event event);
-  bool getKeyState();
-  bool getButtonState();
+  void handleShutdown(const gpiod::edge_event &event);
+  void handleKey(const gpiod::edge_event &event);
+  const PinState getState() const;
 };
 
 // Logical number of pin https://pinout.xyz/pinout/pin29_gpio5/

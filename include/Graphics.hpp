@@ -24,6 +24,7 @@ constexpr const char *IMAGE =
 constexpr const char *FONT =
     "/home/johan/Programs/pay-per-weigh/aarch64/fonts/Lato-Light.ttf";
 constexpr const char *WINDOW_TITLE = "Pay Per Weigh";
+#include "PinState.hpp"
 
 #else
 constexpr const char *LOGO =
@@ -70,7 +71,9 @@ class SDLManager {
 public:
   // Main logic
   SDLError init();
-  void poll(bool keyState, bool buttonState);
+  #ifdef RPI
+     void poll(const PinState &state);
+  #endif 
   void setup();
   void render(int weight);
   void shutdown();

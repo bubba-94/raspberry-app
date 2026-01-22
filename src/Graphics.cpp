@@ -261,13 +261,14 @@ bool SDLManager::getStatus() { return status; }
 
 bool SDLManager::hasEvent() const { return !events.empty(); }
 
-// Event functions
-void SDLManager::poll(bool keyState, bool buttonState) {
-  showImage = keyState;
-  if (buttonState) {
+#ifdef RPI
+void SDLManager::poll(const PinState& state) {
+  showImage = state.keyEnabled;
+  if (state.shutdownRequested) {
     shutdown();
   }
 }
+#endif
 
 void SDLManager::pollEvents() {
 
