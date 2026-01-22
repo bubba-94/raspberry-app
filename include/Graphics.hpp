@@ -9,7 +9,7 @@
 #include <string>
 
 // File to keep this file
-#include "SDLManagerTypes.hpp"
+#include "GraphicSdlDefines.hpp"
 
 /// Windows specs for Raspberry Pi Monitor
 constexpr Uint16 WINDOW_WIDTH = 1920;
