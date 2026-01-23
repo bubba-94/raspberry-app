@@ -12,10 +12,6 @@ int GpioPi::init() {
     return -1;
   }
 
-  settings.set_direction(gpiod::line::direction::INPUT);
-  settings.set_edge_detection(gpiod::line::edge::BOTH);
-  settings.set_active_low(false);
-
   gpiod::request_builder builder = chip.prepare_request();
 
   setup(builder);
@@ -29,15 +25,18 @@ int GpioPi::init() {
   return 0;
 }
 
-void GpioPi::setup(gpiod::request_builder builder) { 
+void GpioPi::setup(gpiod::request_builder &builder) {
+
+  settings.set_direction(gpiod::line::direction::INPUT);
+  settings.set_edge_detection(gpiod::line::edge::BOTH);
+  settings.set_active_low(false);
 
   builder.add_line_settings(
-    gpiod::line::offset{static_cast<unsigned int>(LogicalPin::KEY)},
-    settings);
+      gpiod::line::offset{static_cast<unsigned int>(LogicalPin::KEY)},
+      settings);
   builder.add_line_settings(
-    gpiod::line::offset{static_cast<unsigned int>(LogicalPin::SHUTDOWN)},
-    settings);
-
+      gpiod::line::offset{static_cast<unsigned int>(LogicalPin::SHUTDOWN)},
+      settings);
 }
 
 void GpioPi::poll() {
@@ -51,25 +50,31 @@ void GpioPi::poll() {
   // GPIO Event buffer
   for (const auto &event : buffer) {
 
-    switch (static_cast<unsigned int>(event.line_offset())) {
+    auto pin =
+        static_cast<LogicalPin>(static_cast<unsigned int>(event.line_offset()));
 
-      case LogicalPin::SHUTDOWN: handleShutdown(event); break;
-      case LogicalPin::KEY: handleKey(event); break;
-      
+    switch (pin) {
+
+    case LogicalPin::SHUTDOWN:
+      handleShutdown(event);
+      break;
+    case LogicalPin::KEY:
+      handleKey(event);
+      break;
     }
   }
 }
 
 void GpioPi::handleShutdown(const gpiod::edge_event &event) {
-  state.shutdownRequested = event.type() == gpiod::edge_event::RISING_EDGE;
+  state.shutdownRequested =
+      event.type() == gpiod::edge_event::event_type::RISING_EDGE;
 }
 
 void GpioPi::handleKey(const gpiod::edge_event &event) {
-  state.keyEnabled = event.type() == gpiod::edge_event::RISING_EDGE;
+  state.keyEnabled = event.type() == gpiod::edge_event::event_type::RISING_EDGE;
 }
 
 const PinState GpioPi::getState() const { return state; }
-
 
 #else
 

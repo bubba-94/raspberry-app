@@ -11,7 +11,6 @@ class GpioInterface {
 public:
   virtual ~GpioInterface() {}
   virtual int init() = 0;
-  virtual int setup() = 0;
 };
 
 #ifdef RPI
@@ -40,7 +39,7 @@ private:
 public:
   GpioPi();
   int init() override;
-  void setup(gpiod::request_builder &builder) override;
+  void setup(gpiod::request_builder &builder);
   void poll();
   void handleShutdown(const gpiod::edge_event &event);
   void handleKey(const gpiod::edge_event &event);
@@ -63,7 +62,7 @@ class GpioMock : public GpioInterface {
 public:
   GpioMock();
   int init() override;
-  int setup() override;
+  int setup();
   void toggleKey(bool toggle);
 };
 // End RPI definition

@@ -7,6 +7,9 @@
 #include <memory>
 #include <queue>
 #include <string>
+#ifdef RPI
+#include "PinState.hpp"
+#endif
 
 // File to keep this file
 #include "GraphicSdlDefines.hpp"
@@ -24,8 +27,6 @@ constexpr const char *IMAGE =
 constexpr const char *FONT =
     "/home/johan/Programs/pay-per-weigh/aarch64/fonts/Lato-Light.ttf";
 constexpr const char *WINDOW_TITLE = "Pay Per Weigh";
-#include "PinState.hpp"
-
 #else
 constexpr const char *LOGO =
     "/home/moodin/coding/internship/raspberry-app/img/pandema.png";
@@ -34,7 +35,6 @@ constexpr const char *IMAGE =
 constexpr const char *FONT =
     "/home/moodin/coding/internship/raspberry-app/fonts/Lato-Light.ttf";
 constexpr const char *WINDOW_TITLE = "Desktop Test";
-
 #endif
 // Surface size
 constexpr Uint16 FONT_CHAR_SIZE = 250;
@@ -71,9 +71,9 @@ class SDLManager {
 public:
   // Main logic
   SDLError init();
-  #ifdef RPI
-     void poll(const PinState &state);
-  #endif 
+#ifdef RPI
+  void poll(const PinState &state);
+#endif
   void setup();
   void render(int weight);
   void shutdown();
