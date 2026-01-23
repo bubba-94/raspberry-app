@@ -28,46 +28,101 @@ constexpr const char *PORT_A = "/dev/ttyACM0";
 
 /**
  * @class Device
- * @brief Class for handling the Raspberry Pi weight generating
- * @details Poll a serial port for incoming weight (preferably on a separate
- * thread) and present the result to SDL Window.
+ * @brief Class for handling the Raspberry Pi serial port reading.
+ * @details Poll a serial port for incoming weight and present the result to
+ * SDL Window.
  */
 class Device {
-private:
-  int port;
-  std::time_t timestamp;
-  std::thread worker;
-  std::string incomingWeight{};
-  std::mutex mutex{};
-  std::atomic<uint16_t> weight{};
-  std::atomic<bool> state{};
-
 public:
+  /**
+   * @brief Constructor that initiates state variable and connects to port
+   */
   Device();
+
+  /**
+   * @brief Destructor that sets the state and joins threads.
+   */
   ~Device();
 
-  void init();
-  void setup();
+  /**
+   * @brief Thread function that runs readFromSerial().
+   */
   void poll();
 
-  bool getState();
+  /**
+   * @brief Getter for the weight.
+   *
+   * Sets the current weight in main logic.
+   */
   uint16_t getWeight();
 
-  void readFromSerial();
-  bool connectToPort();
-  void configureSerial(termios &settings, int baud);
-  void operator()() const;
-  void sleepFor(uint8_t delay);
-  void printErrMsg(const char *errMsg);
+private:
+  /**
+   * @brief Convert incoming weight from serial > int.
+   */
   uint16_t convertWeight();
-};
 
-enum class DeviceErr : std::uint8_t {
-  NONE = 0,
-  PORT_ERR = 1,
-  SERIAL_ERR = 2,
-  THREAD_ERR = 3,
-  BUFFER_ERR = 4
+  /**
+   * @brief Reads fd and until condtion is met.
+   *
+   * Pushes a weight that is later converted to an int.
+   */
+  void readFromSerial();
+
+  /**
+   * @brief Opens fd and configures the serial port.
+   *
+   * Called in the constructor to start a succesful connection before reading
+   * from it.
+   *
+   * @return true if succesful.
+   */
+  bool connectToPort();
+
+  /**
+   * @brief Configuarion of a port to represent a common RS232
+   *
+   * @param settings of configured port.
+   * @param baud rating of port, must match both ends.
+   */
+  void configureSerial(termios &settings, int baud);
+
+  /**
+   * @brief File descriptor of open port being used.
+   */
+  int fd;
+
+  /**
+   * @brief Thread for getting the weight from Serial port.
+   */
+  std::thread worker;
+
+  /**
+   * @brief Variable to store the incoming weight
+   */
+  std::string incomingWeight{};
+
+  /**
+   * @brief Variable for thread safe assigning
+   */
+  std::mutex mutex{};
+
+  /**
+   * @brief Variable for storing the converted weight.
+   */
+  std::atomic<uint16_t> weight{};
+
+  /**
+   * @brief State variable used for thread.
+   */
+  std::atomic<bool> state{};
+
+  /**
+   * @brief Variable for pretty printing.
+   *
+   * Might be used later.
+   */
+  // std::time_t timestamp;
 };
 
 #endif

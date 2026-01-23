@@ -13,7 +13,6 @@ int main() {
 #endif
 
   int currentWeight{0};
-  pi.init();
   gpio.init();
 
   // While state is true.
