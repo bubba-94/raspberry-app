@@ -3,7 +3,7 @@
 #include "Graphics.hpp"
 
 int main() {
-  SDLManager sdl;
+  SDLManager sdl("pay-per-weigh");
   Device pi;
 
 #ifdef RPI
@@ -13,9 +13,6 @@ int main() {
 #endif
 
   int currentWeight{0};
-
-  sdl.init();
-  sdl.setup();
   pi.init();
   gpio.init();
 
@@ -34,6 +31,5 @@ int main() {
     sdl.render(currentWeight);
   }
 
-  sdl.shutdown();
   return 0;
 }

@@ -14,10 +14,6 @@
 // File to keep this file
 #include "GraphicSdlDefines.hpp"
 
-/// Windows specs for Raspberry Pi Monitor
-constexpr Uint16 WINDOW_WIDTH = 1920;
-constexpr Uint16 WINDOW_HEIGHT = 1080;
-
 // Image paths ()
 #ifdef RPI
 constexpr const char *LOGO =
@@ -26,7 +22,6 @@ constexpr const char *IMAGE =
     "/home/johan/Programs/pay-per-weigh/aarch64/img/qr.png";
 constexpr const char *FONT =
     "/home/johan/Programs/pay-per-weigh/aarch64/fonts/Lato-Light.ttf";
-constexpr const char *WINDOW_TITLE = "Pay Per Weigh";
 #else
 constexpr const char *LOGO =
     "/home/moodin/coding/internship/raspberry-app/img/pandema.png";
@@ -34,15 +29,20 @@ constexpr const char *IMAGE =
     "/home/moodin/coding/internship/raspberry-app/img/qr.png";
 constexpr const char *FONT =
     "/home/moodin/coding/internship/raspberry-app/fonts/Lato-Light.ttf";
-constexpr const char *WINDOW_TITLE = "Desktop Test";
 #endif
-// Surface size
+
+// Surface sizes and limits
 constexpr Uint16 FONT_CHAR_SIZE = 250;
 constexpr Uint16 FONT_HEIGHT = 500;
 constexpr Uint16 IMAGE_WIDTH = 500;
 constexpr Uint16 IMAGE_HEIGHT = 500;
 constexpr Uint16 LOGO_WIDTH = 242;
 constexpr Uint16 LOGO_HEIGHT = 48;
+/// Windows specs for Raspberry Pi Monitor
+constexpr Uint16 WINDOW_WIDTH = 1920;
+constexpr Uint16 WINDOW_HEIGHT = 1080;
+// Max allowed weight
+constexpr int MAX_WEIGHT = 15001;
 
 // Font position (centered)
 constexpr Uint16 FONT_Y = ((WINDOW_HEIGHT / 2) + FONT_HEIGHT / 2) - FONT_HEIGHT;
@@ -55,62 +55,191 @@ constexpr Uint16 IMAGE_Y =
 // Logo position (bottom right) with some spacing
 constexpr Uint16 LOGO_X = WINDOW_WIDTH - LOGO_WIDTH - 50;
 constexpr Uint16 LOGO_Y = WINDOW_HEIGHT - LOGO_HEIGHT - 50;
-constexpr int MAX_WEIGHT = 15001;
 
 /**
  *
  * @class SDLManager
- * @brief SDL Library wrapper for image rendering.
- * @returns A manager that owns ptrs to SDL_Window, SDL_Render, SDL_Surface,
- * SDL_Texture.
- * @details Class that wraps simple SDL functions to create QR code rendering.
  *
+ * @brief SDL Library wrapper for image rendering.
+ *
+ * @returns
+ * A Window manager that frees memory when they reach out of scope.
+ *
+ * @details
+ * Class that wraps simple SDL functions to create different textures for
+ * rendering.
  */
 class SDLManager {
 
 public:
-  // Main logic
-  SDLError init();
+  /**
+   * @brief Constructor that initializes the SDL window.
+   *
+   * Initializes memory needed and creates standardized window and renderer.
+   *
+   * @param windowTitle Name of the SDL Window
+   */
+  SDLManager(const std::string &windowTitle);
+
+  /**
+   * @brief Destructor for freeing memory and exiting the application
+   */
+  ~SDLManager();
 #ifdef RPI
+  /**
+   * @brief Polls PinState
+   *
+   * Check for changes on GPIO pins and applies them to internal bools,
+   * for manipulating certain states.
+   */
   void poll(const PinState &state);
 #endif
+  /**
+   * @brief Sets up the surface and window specifications
+   */
   void setup();
+
+  /**
+   * @brief Rendering function.
+   *
+   * Called at the end of main to present the result of the application.
+   *
+   * @param weight actual weight that gets presented on application.
+   */
   void render(int weight);
-  void shutdown();
 
-  /*-------------PRINTS-------------*/
-  void printErrMsg(const char *errMsg);
+  /**
+   * @brief Event poller for desktop application.
+   *
+   * Polls event queue used for testing certain functionalities.
+   */
+  void pollEvents();
 
-  // Image functions
-  int loadImage();
-
-  // Checks
-  bool checkWeight(int weight);
-  int checkLengthInChar(int weight);
+  /**
+   * @brief Checks the status of member variable status.
+   *
+   * @return state of SDL Window.
+   */
   bool getStatus();
 
-  // Setups
+private:
+  /**
+   * @brief Helper function for SDL errors.
+   *
+   * @param errMsg message generated from SDL_GetError().
+   */
+  void printErrMsg(const char *errMsg);
+
+  /**
+   * @brief Creates the texture from the provided surfaces.
+   */
+  void createTextures();
+
+  /**
+   * @brief Loads the specified IMG (.png) used for rendereing.
+   */
+  void loadSurfaceOfIMG(const char *filepath);
+
+  /**
+   * @brief Loads the specified TTF (.ttf) used for rendering.
+   *
+   * Sets the pixel depth to 400 and creates the surface needer for weight
+   * texture.
+   *
+   * @param filepath file path to the font (.ttf).
+   * @param startWeight weight to start with set to 0.
+   */
+  void loadFontSurface(const char *filepath, int startWeight);
+
+  /**
+   * @brief Updates font texture if new weight has occured.
+   *
+   * Creates a new texture and sets the expected width and position of the new
+   * weight.
+   *
+   * @param newWeight the new weight to present.
+   */
+  void updateFontTexture(int newWeight);
+
+  /**
+   * @brief Function for determining if a weight update is needed.
+   *
+   * Saves the previous weight for comparing the incoming weight.
+   *
+   * @param weight incoming weight to compare.
+   *
+   * @returns
+   * true - if incoming weight is not the same.
+   * false - if weight is higher than MAX_WEIGHT.
+   */
+  bool checkWeight(int weight);
+
+  /**
+   * @brief State function to for handling evnet loop.
+   *
+   * @return True if event is found.
+   */
+  bool hasEvent() const;
+
+  /**
+   * @brief Pops previous and event a pushes next event forward.
+   *
+   * @return Next available event, or .empty().
+   */
+  SDL_Event getNext();
+
+  /**
+   * @brief Determine the background color of window.
+   *
+   * Clears previous window and set a new rendering color,
+   * based on the amount of RGB and always set to ALPHA_OPAQUE.
+   *
+   * @param r amount of red.
+   * @param g amount of green.
+   * @param b amount of blue.
+   */
+  void setRenderingColor(Uint8 r, Uint8 g, Uint8 b);
+
+  /**
+   * @brief Standard specifics to determine position of textures.
+   *
+   * Represents where a certain texture will appear on the screen measured in
+   * pixels.
+   *
+   * @param surface pointer used by window.
+   * @param x cursor of textures top left corner.
+   * @param y cursor of textures top left corner.
+   * @param w width of texture.
+   * @param h height of texture.
+   */
   void setSurfacePosition(SDLSpec *surface, Uint16 x, Uint16 y, Uint16 w,
                           Uint16 h);
+
+  /**
+   * @brief The length of new incoming weight.
+   *
+   * Checks the length and returns the right amount for setting a new font
+   * width.
+   *
+   * @param weight incoming weight.
+   *
+   * @return the width of new weight.
+   */
+  int checkLengthOfWeight(int weight);
+
+  /**
+   * @brief Sets the wanted width of texture.
+   *
+   * Sets a new width for the weight texture relative to the weight.
+   * Called whenever font needs update.
+   *
+   * @param weight
+   * Depending of the size of the weight.
+   */
   void setFontWidth(int weight);
-  void setRenderingColor(Uint8 r, Uint8 g, Uint8 b);
-  void drawImageFrame();
 
-  // Creation of needed SDL instances
-  SDLError createWindow();
-  SDLError createRenderer();
+  // Raw pointers to SDL instances.
 
-  // Used for updating the weight
-  SDLError updateFontSurface(int newWeight);
-
-  // Image and Logo are SDL_Surfaces, called once in setup
-  SDLError loadSurfaceOfIMG(const char *filepath);
-  SDLError loadFontSurface(const char *filepath, int startWeight);
-  SDLError createImageTexture(SDL_Surface *surface);
-  SDLError createLogoTexture(SDL_Surface *surface);
-  SDLError createFontTexture(SDL_Surface *surface);
-
-  // Get raw instance pointers
   SDL_Window *getRawWindow() const;
   SDL_Renderer *getRawRenderer() const;
   SDL_Surface *getRawSurface() const;
@@ -119,34 +248,47 @@ public:
   SDL_Texture *getRawWeight() const;
   TTF_Font *getRawFont() const;
 
-  // Events, will not be used later
-  bool hasEvent() const;
-  void pollEvents();
-  SDL_Event getNext();
+  // MEMBER VARIABLES
 
-private:
-  // Settings of surfaces
-  SDLSpec logoSpec;
-  SDLSpec qrSpec;
-  SDLSpec weightSpec;
+  /**
+   * @brief The status of SDL Windows.
+   *
+   * Represents the state of the SDL Window. Set true when window is running,
+   * and is set false when shutdown is requested.
+   */
+  bool status = true;
 
-  // Smart pointers for SDL instances
-  sdl_unique<SDL_Window> window;
-  sdl_unique<SDL_Surface> surface;
-  sdl_unique<SDL_Renderer> renderer;
-  sdl_unique<SDL_Texture> logo;   // Texture for logo (always visible)
-  sdl_unique<SDL_Texture> image;  // Texture for QR code
-  sdl_unique<SDL_Texture> weight; // Texture for weight
-  sdl_unique<TTF_Font> font;
+  /**
+   * @brief State of what image to show.
+   *
+   * Represents the image shown in the window. Presents a QR code if set to
+   * true, presents a weight generated if set to false.
+   */
+  bool showImage = true;
 
-  int fontWidth = 0; // Adjustable during runtime
-  int fontX = 0;     // X cursor of font
-
-  bool status = true;    // State of the SDL Window
-  bool showImage = true; // State to decide what image is shown
-
-  SDL_Event event; // Check for single event
+  /**
+   * @brief Event handler for dekstop application.
+   *
+   * Queue for handling events made on the SDL Application Window.
+   * Only used on x86 build.
+   */
   std::queue<SDL_Event> events;
+  SDL_Event event; // Single event happening.
+
+  int fontWidth = 0; // Width of font (dynamic during runtime).
+  int fontX = 0;     // X cursor of font (dynamic during runtime).
+
+  SDLSpec logoSpec;   // Specs for the logo presented (bottom right).
+  SDLSpec qrSpec;     // Specs for the qr images presented (centered).
+  SDLSpec weightSpec; // Specs for the weight presented (centered).
+
+  sdl_unique<SDL_Texture> logo;      // Texture for logo (always visible).
+  sdl_unique<SDL_Texture> image;     // Texture for QR code.
+  sdl_unique<SDL_Texture> weight;    // Texture for weight.
+  sdl_unique<SDL_Surface> surface;   // Surface.
+  sdl_unique<TTF_Font> font;         // Font.
+  sdl_unique<SDL_Renderer> renderer; // Renderer.
+  sdl_unique<SDL_Window> window;     // Window.
 };
 
 #endif

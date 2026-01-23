@@ -9,15 +9,20 @@
 #include <memory>
 
 /**
- * @brief Structure for an SDL ptr deleter
+ * @brief Template for a custom SDL instance deleter
  * @param SDL Class for example (SDL_Window or SDL_Surface)
  */
 template <typename T> struct SDLDeleter;
 
 /**
- * @brief Alias for auto deleter
- * @param T SDL Class pointer
- * @return A unique pointer of T .
+ * @brief Alias for custom deleter
+ *
+ * @param T SDL Class (e.g. SDL_Window or SDL_Surface)
+ *
+ * @return A unique pointer of T.
+ *
+ * @details
+ * Called when @param T goes out of scope and frees memory.
  */
 template <typename T> using sdl_unique = std::unique_ptr<T, SDLDeleter<T>>;
 
@@ -47,22 +52,6 @@ template <> struct SDLDeleter<TTF_Font> {
 };
 
 /**
- * @brief Evaluation for creating resources
- * @return NONE if successful
- * @return > 0 if not succesful
- */
-enum class SDLError : std::uint8_t {
-  NONE = 0,
-  WINDOW_ERR = 1,
-  SURFACE_ERR = 2,
-  RENDER_ERR = 3,
-  TEXTURE_ERR = 4,
-  IMAGE_ERR = 5,
-  LOGO_ERR = 6,
-  FONT_ERR = 7
-};
-
-/**
  * @brief Decide the size and location of a SDL Surface
  * @param color a,r,g,b for coloring of surface
  * @param rect x,y,w,h cooridnates for the size and cursor
@@ -72,6 +61,5 @@ typedef struct SDLSurfaceSpec {
   SDL_Color color;
   SDL_Rect rect;
 } SDLSpec;
-
 
 #endif
