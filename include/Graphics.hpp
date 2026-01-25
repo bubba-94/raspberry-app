@@ -32,8 +32,8 @@ constexpr const char *FONT =
 #endif
 
 // Surface sizes and limits
-constexpr Uint16 FONT_CHAR_SIZE = 250;
-constexpr Uint16 FONT_HEIGHT = 500;
+constexpr Uint16 WEIGHT_CHAR_SIZE = 250;
+constexpr Uint16 WEIGHT_HEIGHT = 500;
 constexpr Uint16 IMAGE_WIDTH = 500;
 constexpr Uint16 IMAGE_HEIGHT = 500;
 constexpr Uint16 LOGO_WIDTH = 242;
@@ -44,8 +44,8 @@ constexpr Uint16 WINDOW_HEIGHT = 1080;
 // Max allowed weight
 constexpr int MAX_WEIGHT = 15001;
 
-// Font position (centered)
-constexpr Uint16 FONT_Y = ((WINDOW_HEIGHT / 2) + FONT_HEIGHT / 2) - FONT_HEIGHT;
+// Weight position (centered)
+constexpr Uint16 WEIGHT_Y = ((WINDOW_HEIGHT / 2) + WEIGHT_HEIGHT / 2) - WEIGHT_HEIGHT;
 
 // Image position (centered)
 constexpr Uint16 IMAGE_X = ((WINDOW_WIDTH / 2) + IMAGE_WIDTH / 2) - IMAGE_WIDTH;
@@ -149,7 +149,7 @@ private:
    * @param filepath file path to the font (.ttf).
    * @param startWeight weight to start with set to 0.
    */
-  void loadFontSurface(const char *filepath, int startWeight);
+  void loadFontSurface(const char *filepath);
 
   /**
    * @brief Updates font texture if new weight has occured.
@@ -275,14 +275,16 @@ private:
   std::queue<SDL_Event> events;
   SDL_Event event; // Single event happening.
 
-  int fontWidth = 0; // Width of font (dynamic during runtime).
-  int fontX = 0;     // X cursor of font (dynamic during runtime).
+  int weightWidth = 0; // Width of font (dynamic during runtime).
+  int weightX = 0;     // X cursor of font (dynamic during runtime).
 
   SDLSpec logoSpec;   // Specs for the logo presented (bottom right).
   SDLSpec qrSpec;     // Specs for the qr images presented (centered).
   SDLSpec weightSpec; // Specs for the weight presented (centered).
+  SDLSpec timeSpec;
 
   sdl_unique<SDL_Texture> logo;      // Texture for logo (always visible).
+  sdl_unique<SDL_Texture> time;      // Texture for timestamp (always visible)
   sdl_unique<SDL_Texture> image;     // Texture for QR code.
   sdl_unique<SDL_Texture> weight;    // Texture for weight.
   sdl_unique<SDL_Surface> surface;   // Surface.

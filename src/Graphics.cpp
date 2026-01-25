@@ -57,7 +57,7 @@ void SDLManager::setup() {
 
   setSurfacePosition(&qrSpec, IMAGE_X, IMAGE_Y, IMAGE_WIDTH, IMAGE_HEIGHT);
   setSurfacePosition(&logoSpec, LOGO_X, LOGO_Y, LOGO_WIDTH, LOGO_HEIGHT);
-  setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
+  setSurfacePosition(&weightSpec, weightX, WEIGHT_Y, weightWidth, WEIGHT_HEIGHT);
 }
 
 void SDLManager::render(int newWeight) {
@@ -99,7 +99,7 @@ void SDLManager::createTextures() {
   if (!image)
     printErrMsg(SDL_GetError());
 
-  loadFontSurface(FONT, 0);
+  loadFontSurface(FONT);
   weight.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
   if (!weight)
     printErrMsg(SDL_GetError());
@@ -113,18 +113,17 @@ void SDLManager::loadSurfaceOfIMG(const char *filepath) {
     printErrMsg(SDL_GetError());
 }
 
-void SDLManager::loadFontSurface(const char *filepath, int weight) {
+void SDLManager::loadFontSurface(const char *filepath) {
 
   font.reset(TTF_OpenFont(filepath, 400));
 
   if (!font)
     printErrMsg(SDL_GetError());
 
-  std::string text = std::to_string(weight);
-  const char *weightConverted = text.c_str();
+  const char *value = "0";
 
   surface.reset(
-      TTF_RenderUTF8_Solid(getRawFont(), weightConverted, weightSpec.color));
+      TTF_RenderUTF8_Solid(getRawFont(), value, weightSpec.color));
 
   if (!surface)
     printErrMsg(SDL_GetError());
@@ -136,7 +135,7 @@ void SDLManager::updateFontTexture(int newWeight) {
   const char *weightConverted = text.c_str();
 
   setFontWidth(newWeight);
-  setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
+  setSurfacePosition(&weightSpec, weightX, WEIGHT_Y, weightWidth, WEIGHT_HEIGHT);
 
   surface.reset(
       TTF_RenderUTF8_Blended(getRawFont(), weightConverted, weightSpec.color));
@@ -258,11 +257,11 @@ int SDLManager::checkLengthOfWeight(int weight) {
 void SDLManager::setFontWidth(int weight) {
   int length = checkLengthOfWeight(weight);
 
-  fontWidth = FONT_CHAR_SIZE * length;
+  weightWidth = WEIGHT_CHAR_SIZE * length;
 
-  fontX = ((WINDOW_WIDTH / 2) + fontWidth / 2) - fontWidth;
+  weightX = ((WINDOW_WIDTH / 2) + weightWidth / 2) - weightWidth;
 
-  setSurfacePosition(&weightSpec, fontX, FONT_Y, fontWidth, FONT_HEIGHT);
+  setSurfacePosition(&weightSpec, weightX, WEIGHT_Y, weightWidth, WEIGHT_HEIGHT);
 }
 
 SDL_Window *SDLManager::getRawWindow() const { return window.get(); }
