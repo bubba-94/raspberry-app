@@ -19,6 +19,8 @@ endif()
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
 
+    add_compile_definitions(ASSET_DIR="${CMAKE_SOURCE_DIR}/assets")
+
     set(OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin/x86")
 
     message(STATUS ${STARTYELLOW})

@@ -17,19 +17,21 @@
 
 // Image paths ()
 #ifdef RPI
-constexpr const char *LOGO =
-    "/home/johan/Programs/pay-per-weigh/aarch64/img/pandema.png";
-constexpr const char *IMAGE =
-    "/home/johan/Programs/pay-per-weigh/aarch64/img/qr.png";
-constexpr const char *FONT =
-    "/home/johan/Programs/pay-per-weigh/aarch64/fonts/Lato-Light.ttf";
+constexpr const char *LOGO = "assets/img/pandema.png";
+constexpr const char *IMAGE = "assets/img/qr.png";
+constexpr const char *FONT = "assets/fonts/Lato-Light.ttf";
 #else
-constexpr const char *LOGO =
-    "/home/moodin/coding/internship/raspberry-app/img/pandema.png";
-constexpr const char *IMAGE =
-    "/home/moodin/coding/internship/raspberry-app/img/qr.png";
-constexpr const char *FONT =
-    "/home/moodin/coding/internship/raspberry-app/fonts/Lato-Light.ttf";
+
+constexpr const char *ASSET_DIR_STR = ASSET_DIR;
+
+inline std::string assetPath(const std::string &relative) {
+  return std::string(ASSET_DIR_STR) + "/" + relative;
+}
+
+// Paths
+const std::string LOGO = assetPath("img/pandema.png");
+const std::string IMAGE = assetPath("img/qr.png");
+const std::string FONT = assetPath("fonts/Lato-Light.ttf");
 #endif
 
 // Surface sizes and limits

@@ -101,21 +101,34 @@ void SDLManager::printErrMsg(const char *errMsg) {
 
 void SDLManager::createTextures() {
 
-  // Loads the logo into memory
+// Loads the logo into memory
+#ifdef RPI
   loadSurfaceOfIMG(LOGO);
+#else
+  loadSurfaceOfIMG(LOGO.c_str());
+#endif
   logo.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
   if (!logo)
     printErrMsg(SDL_GetError());
 
-  // Loads the qr code into memory
+// Loads the qr code into memory
+#ifdef RPI
   loadSurfaceOfIMG(IMAGE);
+#else
+  loadSurfaceOfIMG(IMAGE.c_str());
+#endif
+
   image.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
   if (!image)
     printErrMsg(SDL_GetError());
 
-  // Loads the specified font into memory time and weight uses same font. (can
-  // switch)
+// Loads the specified font into memory time and weight uses same font. (can
+// switch)
+#ifdef RPI
   loadFontSurface(FONT);
+#else
+  loadFontSurface(FONT.c_str());
+#endif
 
   time.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
   if (!time)
