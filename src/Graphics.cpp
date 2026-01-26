@@ -38,6 +38,7 @@ SDLManager::SDLManager(const std::string &windowTitle) {
   status = true;
 
   setup();
+
   std::cout << "[SDL] Initialization successful" << "\n";
 }
 SDLManager::~SDLManager() {
@@ -55,29 +56,39 @@ void SDLManager::setup() {
   // Set surface framings to default
   createTextures();
 
+  setSurfacePosition(&timeSpec, TIME_X, TIME_Y, TIME_WIDTH, TIME_HEIGHT);
   setSurfacePosition(&qrSpec, IMAGE_X, IMAGE_Y, IMAGE_WIDTH, IMAGE_HEIGHT);
   setSurfacePosition(&logoSpec, LOGO_X, LOGO_Y, LOGO_WIDTH, LOGO_HEIGHT);
-  setSurfacePosition(&weightSpec, weightX, WEIGHT_Y, weightWidth, WEIGHT_HEIGHT);
+  setSurfacePosition(&weightSpec, weightX, WEIGHT_Y, weightWidth,
+                     WEIGHT_HEIGHT);
 }
 
-void SDLManager::render(int newWeight) {
-  SDL_RenderClear(getRawRenderer());
-  bool check = checkWeight(newWeight);
+void SDLManager::render(int newWeight, std::string_view clock) {
 
-  // Proceed if check valid and needs update
-  if (check == true) {
-    std::cout << "[SDL] New weight: " << newWeight << "\n";
-    updateFontTexture(newWeight);
+  SDL_RenderClear(getRawRenderer());
+
+  bool weightCheck = checkWeight(newWeight);
+  bool timepointCheck = checkTime(clock);
+
+  if (timepointCheck) {
+    updateTimeTexture(clock);
   }
 
-  // Switch the rendering QR, or WEIGHT
+  // Proceed if check valid and needs update
+  if (weightCheck) {
+    std::cout << "[SDL] New weight: " << newWeight << "\n";
+    updateWeightTexture(newWeight);
+  }
+
+  // Switch the rendering to QR code or WEIGHT
   if (showImage) {
     SDL_RenderCopy(getRawRenderer(), getRawWeight(), NULL, &weightSpec.rect);
   } else {
     SDL_RenderCopy(getRawRenderer(), getRawImage(), NULL, &qrSpec.rect);
   }
 
-  // Always present logo
+  // Always present time and logo
+  SDL_RenderCopy(getRawRenderer(), getRawTime(), NULL, &timeSpec.rect);
   SDL_RenderCopy(getRawRenderer(), getRawLogo(), NULL, &logoSpec.rect);
 
   SDL_RenderPresent(getRawRenderer());
@@ -89,17 +100,27 @@ void SDLManager::printErrMsg(const char *errMsg) {
 }
 
 void SDLManager::createTextures() {
+
+  // Loads the logo into memory
   loadSurfaceOfIMG(LOGO);
   logo.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
   if (!logo)
     printErrMsg(SDL_GetError());
 
+  // Loads the qr code into memory
   loadSurfaceOfIMG(IMAGE);
   image.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
   if (!image)
     printErrMsg(SDL_GetError());
 
+  // Loads the specified font into memory time and weight uses same font. (can
+  // switch)
   loadFontSurface(FONT);
+
+  time.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
+  if (!time)
+    printErrMsg(SDL_GetError());
+
   weight.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
   if (!weight)
     printErrMsg(SDL_GetError());
@@ -122,31 +143,43 @@ void SDLManager::loadFontSurface(const char *filepath) {
 
   const char *value = "0";
 
-  surface.reset(
-      TTF_RenderUTF8_Solid(getRawFont(), value, weightSpec.color));
+  surface.reset(TTF_RenderUTF8_Solid(getRawFont(), value, weightSpec.color));
 
   if (!surface)
     printErrMsg(SDL_GetError());
 }
 
-void SDLManager::updateFontTexture(int newWeight) {
+void SDLManager::updateWeightTexture(int newWeight) {
 
-  std::string text = std::to_string(newWeight);
-  const char *weightConverted = text.c_str();
+  std::string value = std::to_string(newWeight);
 
-  setFontWidth(newWeight);
-  setSurfacePosition(&weightSpec, weightX, WEIGHT_Y, weightWidth, WEIGHT_HEIGHT);
+  setWeightWidth(newWeight);
+  setSurfacePosition(&weightSpec, weightX, WEIGHT_Y, weightWidth,
+                     WEIGHT_HEIGHT);
 
   surface.reset(
-      TTF_RenderUTF8_Blended(getRawFont(), weightConverted, weightSpec.color));
-
+      TTF_RenderUTF8_Blended(getRawFont(), value.c_str(), weightSpec.color));
   if (!surface)
     printErrMsg(SDL_GetError());
 
   weight.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
-
   if (!weight)
     printErrMsg(SDL_GetError());
+}
+
+void SDLManager::updateTimeTexture(std::string_view currentTimepoint) {
+
+  timepoint = std::string(currentTimepoint);
+
+  surface.reset(
+      TTF_RenderUTF8_Solid(getRawFont(), timepoint.c_str(), weightSpec.color));
+  if (!surface)
+    printErrMsg(SDL_GetError());
+
+  time.reset(SDL_CreateTextureFromSurface(getRawRenderer(), getRawSurface()));
+  if (!time) {
+    printErrMsg(SDL_GetError());
+  }
 }
 
 bool SDLManager::checkWeight(int weight) {
@@ -165,6 +198,17 @@ bool SDLManager::checkWeight(int weight) {
 
   previousWeight = weight;
   return false;
+}
+
+bool SDLManager::checkTime(std::string_view currentTimepoint) {
+  std::string previousTimepoint{};
+
+  if (currentTimepoint == previousTimepoint.c_str()) {
+    return false;
+  } else {
+    previousTimepoint = currentTimepoint;
+    return true;
+  }
 }
 
 bool SDLManager::getStatus() { return status; }
@@ -208,7 +252,9 @@ void SDLManager::pollEvents() {
         break;
 
       case SDL_MOUSEBUTTONDOWN:
-        std::cout << "[SDL] Switching texture: \n";
+        std::cout << "[SDL] Switching texture | " << " X: " << event.button.x
+                  << " Y: " << event.button.y << "\n";
+
         showImage = !showImage;
         break;
       default:
@@ -254,20 +300,22 @@ int SDLManager::checkLengthOfWeight(int weight) {
   return length;
 }
 
-void SDLManager::setFontWidth(int weight) {
+void SDLManager::setWeightWidth(int weight) {
   int length = checkLengthOfWeight(weight);
 
   weightWidth = WEIGHT_CHAR_SIZE * length;
 
   weightX = ((WINDOW_WIDTH / 2) + weightWidth / 2) - weightWidth;
 
-  setSurfacePosition(&weightSpec, weightX, WEIGHT_Y, weightWidth, WEIGHT_HEIGHT);
+  setSurfacePosition(&weightSpec, weightX, WEIGHT_Y, weightWidth,
+                     WEIGHT_HEIGHT);
 }
 
 SDL_Window *SDLManager::getRawWindow() const { return window.get(); }
 SDL_Renderer *SDLManager::getRawRenderer() const { return renderer.get(); }
 SDL_Surface *SDLManager::getRawSurface() const { return surface.get(); }
-SDL_Texture *SDLManager::getRawImage() const { return image.get(); }
 SDL_Texture *SDLManager::getRawLogo() const { return logo.get(); }
+SDL_Texture *SDLManager::getRawTime() const { return time.get(); }
+SDL_Texture *SDLManager::getRawImage() const { return image.get(); }
 SDL_Texture *SDLManager::getRawWeight() const { return weight.get(); }
 TTF_Font *SDLManager::getRawFont() const { return font.get(); }
