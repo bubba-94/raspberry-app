@@ -4,30 +4,32 @@
 
 int main() {
   SDLManager sdl("pay-per-weigh");
-  Device pi;
 
 #ifdef RPI
+  Device pi;
   GpioPi gpio;
 #else
   GpioMock gpio;
 #endif
-
+  std::string timePoint{};
   int currentWeight{0};
   gpio.init();
 
-  // While state is true.
   while (sdl.getStatus()) {
 
 #ifdef RPI
     currentWeight = pi.getWeight();
+    timePoint = pi.getTimepoint();
     gpio.poll();
     sdl.poll(gpio.getState());
 #else
+    // For testing on desktop
+    timePoint = "[TEST] 940601 - 13:37";
     sdl.pollEvents();
     currentWeight = 1337;
 #endif
 
-    sdl.render(currentWeight);
+    sdl.render(currentWeight, timePoint);
   }
 
   return 0;

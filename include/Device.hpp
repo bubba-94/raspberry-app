@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
+#include <string_view>
+#include <vector>
 
 // Timestamp
 #include <ctime>
@@ -47,14 +49,26 @@ public:
   /**
    * @brief Thread function that runs readFromSerial().
    */
-  void poll();
+  void pollWeight();
+
+  /**
+   * @brief Thread function that runs readTime().
+   */
+  void pollTime();
 
   /**
    * @brief Getter for the weight.
    *
-   * Sets the current weight in main logic.
+   * Gets the current weight in main logic.
    */
   uint16_t getWeight();
+
+  /**
+   * @brief Getter for the clock string
+   *
+   * Gets the current timePoint string
+   */
+  std::string_view getTimepoint() const;
 
 private:
   /**
@@ -68,6 +82,16 @@ private:
    * Pushes a weight that is later converted to an int.
    */
   void readFromSerial();
+
+  /**
+   * @brief Set the current time point.
+   */
+  void setTime();
+
+  /**
+   * @brief set the current timepoint
+   */
+  void initiateTime();
 
   /**
    * @brief Opens fd and configures the serial port.
@@ -93,9 +117,9 @@ private:
   int fd;
 
   /**
-   * @brief Thread for getting the weight from Serial port.
+   * @brief Threads running
    */
-  std::thread worker;
+  std::vector<std::thread> workers;
 
   /**
    * @brief Variable to store the incoming weight
@@ -118,11 +142,14 @@ private:
   std::atomic<bool> state{};
 
   /**
-   * @brief Variable for pretty printing.
+   * @brief Thread safe variable for updating the timepoint variable.
    *
-   * Might be used later.
+   * Will always be presented on the SDL Window.
    */
-  // std::time_t timestamp;
+  std::string timepoint;
+
+  //! Design of the timepoint.
+  char timeString[std::size("dd/mm-yy hh:mm")]; // Store converted local time.
 };
 
 #endif
