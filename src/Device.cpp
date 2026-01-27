@@ -1,34 +1,48 @@
 #include "Device.hpp"
 
-Device::Device() : state{true} {}
-Device::~Device() {
-  state = false;
-  if (worker.joinable()) {
-    std::cout << "Joined\n";
-    worker.join();
-  }
-  close(port);
-}
-
-void Device::init() {
+Device::Device() : state{true} {
   if (!connectToPort()) {
-    std::cout << "Port connection failed\n";
+    std::cout << "[Device] Port connection failed\n";
   }
 
-  worker = std::thread(&Device::poll, this);
+  // Start working threads
+  workers.emplace_back(&Device::pollWeight, this);
+  workers.emplace_back(&Device::pollTime, this);
 }
-void Device::setup() {}
+Device::~Device() {
 
-void Device::poll() { readFromSerial(); }
+  // End sessions
+  state = false;
+
+  close(fd);
+
+  // Join all threads
+  for (auto &thread : workers) {
+    if (thread.joinable()) {
+      thread.join();
+    }
+  }
+}
+
+void Device::pollWeight() { readFromSerial(); }
+void Device::pollTime() { setTime(); }
+
+uint16_t Device::getWeight() { return weight; }
+std::string_view Device::getTimepoint() const { return timepoint; }
+
+uint16_t Device::convertWeight() {
+  weight = std::stoi(incomingWeight);
+  return weight;
+}
 
 void Device::readFromSerial() {
 
   char c;
-  while (state) {
-    int bytes = read(port, &c, 1);
+  while (state.load()) {
+    int bytes = read(fd, &c, 1);
 
     if (bytes <= 0)
-      continue;
+      break;
 
     std::lock_guard<std::mutex> lock(mutex);
 
@@ -45,29 +59,60 @@ void Device::readFromSerial() {
   }
 }
 
+void Device::setTime() {
+  while (state.load()) {
+
+    // Used for measuring clock updates
+    auto now = std::chrono::system_clock::now();
+    std::time_t t = std::chrono::system_clock::to_time_t(now);
+
+    {
+      // Aquire lock for updates.
+      std::tm tm{};
+      localtime_r(&t, &tm);
+      std::lock_guard<std::mutex> lock(mutex);
+      std::strftime(std::data(timeString), std::size(timeString),
+                    "%d/%m-%y %H:%M", &tm);
+
+      timepoint = timeString;
+    }
+
+    // Align to next real-world minute
+    auto nextMinute = std::chrono::time_point_cast<std::chrono::minutes>(now) +
+                      std::chrono::minutes(1);
+
+    std::cout << "[Device] " << timeString << "\n";
+
+    // Shorten the sleep if needed. (shutdown)
+    while (state.load() && std::chrono::system_clock::now() < nextMinute) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+  }
+}
+
 bool Device::connectToPort() {
 
   // Open port before configuration
-  port = open(PORT_A, O_RDWR | O_NOCTTY);
-  if (port < 0) {
-    std::cout << "Port opening failed\n";
-    return -1;
+  fd = open(PORT_A, O_RDWR | O_NOCTTY);
+  if (fd < 0) {
+    std::cout << "[Device] Port opening failed\n";
+    return false;
   }
   struct termios pts;
 
-  if (tcgetattr(port, &pts) != 0) {
-    std::cout << "Existing settings not read\n";
-    return -1;
+  if (tcgetattr(fd, &pts) != 0) {
+    std::cout << "[Device] Existing settings not read\n";
+    return false;
   }
   // Terminal confiuration instance
   configureSerial(pts, 9600);
 
-  if (tcsetattr(port, TCSANOW, &pts) != 0) {
-    std::cout << "Saving new setting not successful";
-    return -1;
+  if (tcsetattr(fd, TCSANOW, &pts) != 0) {
+    std::cout << "[Device] Saving new setting not successful";
+    return false;
   }
 
-  std::cout << PORT_A << " is open." << "\n";
+  std::cout << "[Device] " << PORT_A << " is open." << "\n";
 
   return true;
 }
@@ -99,15 +144,4 @@ void Device::configureSerial(termios &settings, int baud) {
 
   cfsetispeed(&settings, baud);
   cfsetospeed(&settings, baud);
-}
-
-void Device::sleepFor(uint8_t delay) {
-  std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-}
-
-uint16_t Device::getWeight() { return weight; }
-
-uint16_t Device::convertWeight() {
-  weight = std::stoi(incomingWeight);
-  return weight;
 }

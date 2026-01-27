@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
+#include <string_view>
+#include <vector>
 
 // Timestamp
 #include <ctime>
@@ -28,46 +30,126 @@ constexpr const char *PORT_A = "/dev/ttyACM0";
 
 /**
  * @class Device
- * @brief Class for handling the Raspberry Pi weight generating
- * @details Poll a serial port for incoming weight (preferably on a separate
- * thread) and present the result to SDL Window.
+ * @brief Class for handling the Raspberry Pi serial port reading.
+ * @details Poll a serial port for incoming weight and present the result to
+ * SDL Window.
  */
 class Device {
-private:
-  int port;
-  std::time_t timestamp;
-  std::thread worker;
-  std::string incomingWeight{};
-  std::mutex mutex{};
-  std::atomic<uint16_t> weight{};
-  std::atomic<bool> state{};
-
 public:
+  /**
+   * @brief Constructor that initiates state variable and connects to port
+   */
   Device();
+
+  /**
+   * @brief Destructor that sets the state and joins threads.
+   */
   ~Device();
 
-  void init();
-  void setup();
-  void poll();
+  /**
+   * @brief Thread function that runs readFromSerial().
+   */
+  void pollWeight();
 
-  bool getState();
+  /**
+   * @brief Thread function that runs readTime().
+   */
+  void pollTime();
+
+  /**
+   * @brief Getter for the weight.
+   *
+   * Gets the current weight in main logic.
+   */
   uint16_t getWeight();
 
-  void readFromSerial();
-  bool connectToPort();
-  void configureSerial(termios &settings, int baud);
-  void operator()() const;
-  void sleepFor(uint8_t delay);
-  void printErrMsg(const char *errMsg);
-  uint16_t convertWeight();
-};
+  /**
+   * @brief Getter for the clock string
+   *
+   * Gets the current timePoint string
+   */
+  std::string_view getTimepoint() const;
 
-enum class DeviceErr : std::uint8_t {
-  NONE = 0,
-  PORT_ERR = 1,
-  SERIAL_ERR = 2,
-  THREAD_ERR = 3,
-  BUFFER_ERR = 4
+private:
+  /**
+   * @brief Convert incoming weight from serial > int.
+   */
+  uint16_t convertWeight();
+
+  /**
+   * @brief Reads fd and until condtion is met.
+   *
+   * Pushes a weight that is later converted to an int.
+   */
+  void readFromSerial();
+
+  /**
+   * @brief Set the current time point.
+   */
+  void setTime();
+
+  /**
+   * @brief set the current timepoint
+   */
+  void initiateTime();
+
+  /**
+   * @brief Opens fd and configures the serial port.
+   *
+   * Called in the constructor to start a succesful connection before reading
+   * from it.
+   *
+   * @return true if succesful.
+   */
+  bool connectToPort();
+
+  /**
+   * @brief Configuarion of a port to represent a common RS232
+   *
+   * @param settings of configured port.
+   * @param baud rating of port, must match both ends.
+   */
+  void configureSerial(termios &settings, int baud);
+
+  /**
+   * @brief File descriptor of open port being used.
+   */
+  int fd;
+
+  /**
+   * @brief Threads running
+   */
+  std::vector<std::thread> workers;
+
+  /**
+   * @brief Variable to store the incoming weight
+   */
+  std::string incomingWeight{};
+
+  /**
+   * @brief Variable for thread safe assigning
+   */
+  std::mutex mutex{};
+
+  /**
+   * @brief Variable for storing the converted weight.
+   */
+  std::atomic<uint16_t> weight{};
+
+  /**
+   * @brief State variable used for thread.
+   */
+  std::atomic<bool> state{};
+
+  /**
+   * @brief Thread safe variable for updating the timepoint variable.
+   *
+   * Will always be presented on the SDL Window.
+   */
+  std::string timepoint;
+
+  //! Design of the timepoint.
+  char timeString[std::size("dd/mm-yy hh:mm")]; // Store converted local time.
 };
 
 #endif

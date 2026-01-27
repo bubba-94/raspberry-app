@@ -65,13 +65,10 @@ CMakeScripts/
 
 
 # Repo specific 
-x86
-aarch64
+bin/
 DIARY.md
 flow.drawio
-img/
 build-*/
-fonts/
 
 # Python ignores
 

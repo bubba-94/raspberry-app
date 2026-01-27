@@ -3,37 +3,32 @@
 #include "Graphics.hpp"
 
 int main() {
-  SDLManager sdl;
-  Device pi;
+  SDLManager sdl("pay-per-weigh");
 
 #ifdef RPI
-  GpioPi gpio;
-#else
-  GpioMock gpio;
+  Device pi;
+  GpioPi gpio("/dev/gpiochip4");
 #endif
 
+  std::string timePoint{};
   int currentWeight{0};
 
-  sdl.init();
-  sdl.setup();
-  pi.init();
-  gpio.init();
-
-  // While state is true.
   while (sdl.getStatus()) {
 
 #ifdef RPI
     currentWeight = pi.getWeight();
+    timePoint = pi.getTimepoint();
     gpio.poll();
-    sdl.poll(gpio.getKeyState(), gpio.getButtonState());
+    sdl.poll(gpio.getState());
 #else
+    // For testing on desktop
+    timePoint = "[TEST] 940601 - 13:37";
     sdl.pollEvents();
     currentWeight = 1337;
 #endif
 
-    sdl.render(currentWeight);
+    sdl.render(currentWeight, timePoint);
   }
 
-  sdl.shutdown();
   return 0;
 }
