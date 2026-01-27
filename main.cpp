@@ -7,13 +7,11 @@ int main() {
 
 #ifdef RPI
   Device pi;
-  GpioPi gpio;
-#else
-  GpioMock gpio;
+  GpioPi gpio("/dev/gpiochip4");
 #endif
+
   std::string timePoint{};
   int currentWeight{0};
-  gpio.init();
 
   while (sdl.getStatus()) {
 

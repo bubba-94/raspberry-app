@@ -1,72 +1,81 @@
+#ifdef RPI
 #ifndef GPIO_HPP
 #define GPIO_HPP
 
 #include <iostream>
-
-/**
- * @class GpioInterface
- * @details Interface to succesfully compile for both architectures.
- */
-class GpioInterface {
-public:
-  virtual ~GpioInterface() {}
-  virtual int init() = 0;
-};
-
-#ifdef RPI
-#include <array>
-#include <filesystem>
-#include <gpiod.hpp>
-#include <memory>
 #include <optional>
-#include <stddef.h>
+
+#include <gpiod.hpp>
 
 #include "PinState.hpp"
 
-constexpr size_t NUM_PINS = 40;
-
 /**
  * @class GpioPi
- * @details Real working version for pi itself
+ *
+ * @brief
+ * Initiates the Gpio lines tested on a Raspberry Pi 5
+ *
+ * @returns
+ * A manager for the GPIO lines on the Raspberry Pi
+ *
+ * @details
+ * The class handles edge event cases on certain defined Pins.
+ * Sets a current state and forwards it to a PinState that is shared with the
+ * SDLManager. The pins determine what can/will be shown and shutdown request.
+ * Possibility to add more logic.
  */
-class GpioPi : public GpioInterface {
-private:
-  std::filesystem::path PATH{"/dev/gpiochip4"};
-  gpiod::line_settings settings;
-  std::optional<gpiod::line_request> request;
-  PinState state;
-
+class GpioPi {
 public:
-  GpioPi();
-  int init() override;
-  void setup(gpiod::request_builder &builder);
+  /**
+   * @brief Constructor for the Gpio chip
+   *
+   * On Raspberry Pi 5 the path is "/dev/gpiochip4/"
+   */
+  GpioPi(const std::string &path);
+  ~GpioPi();
+
+  /**
+   * @brief Poll for edge events
+   *
+   * Requests are added into a edge event buffer and are read at entry
+   */
   void poll();
-  void handleShutdown(const gpiod::edge_event &event);
-  void handleKey(const gpiod::edge_event &event);
+
+  /**
+   * @brief Getter for states shared between Graphics and UI.
+   */
   const PinState getState() const;
+
+private:
+  /**
+   * @brief Configures the settings and builds the line offset.
+   */
+  void setup(gpiod::request_builder &builder);
+
+  /**
+   * @brief Handler for the shutdown button event.
+   */
+  void handleShutdown(const gpiod::edge_event &event);
+
+  /**
+   * @brief Handler for the key pin event.
+   */
+  void handleKey(const gpiod::edge_event &event);
+
+  gpiod::line_settings settings; // Configurations of lines.
+  std::optional<gpiod::line_request>
+      request;    // Handle information about requests.
+  PinState state; // State variable of pins (HIGH / LOW).
 };
 
-// Logical number of pin https://pinout.xyz/pinout/pin29_gpio5/
+/**
+ * @brief Enum class for offset of GPIO Pins.
+ *
+ * Pin layout of Raspberry Pi 5: https://pinout.xyz/pinout/pin29_gpio5/
+ */
 enum class LogicalPin : unsigned int {
   KEY = 17,
   SHUTDOWN = 27,
 };
-
-#else
-
-/**
- * @class GpioMock
- * @details Desktop version of Gpio (STUB)'
- */
-class GpioMock : public GpioInterface {
-public:
-  GpioMock();
-  int init() override;
-  int setup();
-  void toggleKey(bool toggle);
-};
-// End RPI definition
 #endif
-
-// Ending header guard
 #endif
