@@ -20,8 +20,13 @@
 constexpr const char *LOGO = "assets/img/pandema.png";
 constexpr const char *IMAGE = "assets/img/qr.png";
 constexpr const char *FONT = "assets/fonts/Lato-Light.ttf";
+// Windows specs for Raspberry Pi Monitor (standing)
+constexpr Uint16 WINDOW_WIDTH = 1080;
+constexpr Uint16 WINDOW_HEIGHT = 1920;
+constexpr Uint16 WEIGHT_CHAR_SIZE = 200;
 #else
 
+// Relative path for assets
 constexpr const char *ASSET_DIR_STR = ASSET_DIR;
 
 inline std::string assetPath(const std::string &relative) {
@@ -32,10 +37,14 @@ inline std::string assetPath(const std::string &relative) {
 const std::string LOGO = assetPath("img/pandema.png");
 const std::string IMAGE = assetPath("img/qr.png");
 const std::string FONT = assetPath("fonts/Lato-Light.ttf");
+
+// Windows specs for Dekstop Application ()
+constexpr Uint16 WINDOW_WIDTH = 1920;
+constexpr Uint16 WINDOW_HEIGHT = 1080;
+constexpr Uint16 WEIGHT_CHAR_SIZE = 250;
 #endif
 
 // Surface sizes and limits
-constexpr Uint16 WEIGHT_CHAR_SIZE = 250;
 constexpr Uint16 WEIGHT_HEIGHT = 500;
 constexpr Uint16 IMAGE_WIDTH = 500;
 constexpr Uint16 IMAGE_HEIGHT = 500;
@@ -43,9 +52,7 @@ constexpr Uint16 LOGO_WIDTH = 242;
 constexpr Uint16 LOGO_HEIGHT = 48;
 constexpr Uint16 TIME_WIDTH = 300;
 constexpr Uint16 TIME_HEIGHT = 48;
-/// Windows specs for Raspberry Pi Monitor
-constexpr Uint16 WINDOW_WIDTH = 1920;
-constexpr Uint16 WINDOW_HEIGHT = 1080;
+
 // Max allowed weight
 constexpr int MAX_WEIGHT = 15001;
 
